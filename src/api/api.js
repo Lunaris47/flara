@@ -7,77 +7,132 @@ import axios from "axios";
 
 const API_BASE = "https://flara-api-production.up.railway.app";
 
-const api = axios.create({
-    baseURL: API_BASE,
-    headers: {
-        "Content-Type": "application/json",
-    },
-});
+// ===============================
+// HELPERS
+// ===============================
 
-// Attach JWT token to every request automatically
-api.interceptors.request.use((config) => {
-    const token =
-        localStorage.getItem("flara_token") ||
-        sessionStorage.getItem("flara_token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
+export function getStoredToken() {
+    return localStorage.getItem("flara_token") || sessionStorage.getItem("flara_token");
+}
 
-// Handle expired tokens globally
-api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401 || error.response?.status === 403) {
-            localStorage.removeItem("flara_token");
-            localStorage.removeItem("flara_user");
-            sessionStorage.removeItem("flara_token");
-            sessionStorage.removeItem("flara_user");
-            window.location.href = "/login";
-        }
-        return Promise.reject(error);
-    }
-);
+export function clearStoredAuth() {
+    localStorage.removeItem("flara_token");
+    localStorage.removeItem("flara_user");
+    sessionStorage.removeItem("flara_token");
+    sessionStorage.removeItem("flara_user");
+}
+
+function authHeaders() {
+    const token = getStoredToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 // ===============================
-// AUTH
+// AUTH (no token needed)
 // ===============================
-export const register = (data) => api.post("/api/auth/register", data);
-export const login = (data) => api.post("/api/auth/login", data);
+export const register = (data) =>
+    axios.post(`${API_BASE}/api/auth/register`, data, {
+        headers: { "Content-Type": "application/json" }
+    });
+
+export const login = (data) =>
+    axios.post(`${API_BASE}/api/auth/login`, data, {
+        headers: { "Content-Type": "application/json" }
+    });
 
 // ===============================
 // DAILY LOGS
 // ===============================
-export const savePhysicalLog = (data) => api.post("/api/logs/physical", data);
-export const getPhysicalLogs = () => api.get("/api/logs/physical");
-export const getPhysicalLogByDate = (date) => api.get(`/api/logs/physical/date/${date}`);
+export const savePhysicalLog = (data) =>
+    axios.post(`${API_BASE}/api/logs/physical`, data, {
+        headers: { "Content-Type": "application/json", ...authHeaders() }
+    });
 
-export const saveMentalLog = (data) => api.post("/api/logs/mental", data);
-export const getMentalLogs = () => api.get("/api/logs/mental");
-export const getMentalLogByDate = (date) => api.get(`/api/logs/mental/date/${date}`);
+export const getPhysicalLogs = () => {
+    const headers = authHeaders();
+    return axios.get(`${API_BASE}/api/logs/physical`, { headers });
+};
+
+export const getPhysicalLogByDate = (date) =>
+    axios.get(`${API_BASE}/api/logs/physical/date/${date}`, {
+        headers: authHeaders()
+    });
+
+export const saveMentalLog = (data) =>
+    axios.post(`${API_BASE}/api/logs/mental`, data, {
+        headers: { "Content-Type": "application/json", ...authHeaders() }
+    });
+
+export const getMentalLogs = () =>
+    axios.get(`${API_BASE}/api/logs/mental`, {
+        headers: authHeaders()
+    });
+
+export const getMentalLogByDate = (date) =>
+    axios.get(`${API_BASE}/api/logs/mental/date/${date}`, {
+        headers: authHeaders()
+    });
 
 // ===============================
 // MEALS
 // ===============================
-export const saveMealLog = (data) => api.post("/api/meals", data);
-export const getMealLogs = () => api.get("/api/meals");
-export const getMealLogsByDate = (date) => api.get(`/api/meals/date/${date}`);
-export const deleteMealLog = (id) => api.delete(`/api/meals/${id}`);
+export const saveMealLog = (data) =>
+    axios.post(`${API_BASE}/api/meals`, data, {
+        headers: { "Content-Type": "application/json", ...authHeaders() }
+    });
+
+export const getMealLogs = () =>
+    axios.get(`${API_BASE}/api/meals`, {
+        headers: authHeaders()
+    });
+
+export const getMealLogsByDate = (date) =>
+    axios.get(`${API_BASE}/api/meals/date/${date}`, {
+        headers: authHeaders()
+    });
+
+export const deleteMealLog = (id) =>
+    axios.delete(`${API_BASE}/api/meals/${id}`, {
+        headers: authHeaders()
+    });
 
 // ===============================
 // MEDICATIONS
 // ===============================
-export const saveMedicationLog = (data) => api.post("/api/medications", data);
-export const getMedicationLogs = () => api.get("/api/medications");
-export const deleteMedicationLog = (id) => api.delete(`/api/medications/${id}`);
+export const saveMedicationLog = (data) =>
+    axios.post(`${API_BASE}/api/medications`, data, {
+        headers: { "Content-Type": "application/json", ...authHeaders() }
+    });
+
+export const getMedicationLogs = () =>
+    axios.get(`${API_BASE}/api/medications`, {
+        headers: authHeaders()
+    });
+
+export const deleteMedicationLog = (id) =>
+    axios.delete(`${API_BASE}/api/medications/${id}`, {
+        headers: authHeaders()
+    });
 
 // ===============================
 // FLARES
 // ===============================
-export const saveFlare = (data) => api.post("/api/flares", data);
-export const getFlares = () => api.get("/api/flares");
-export const updateFlare = (id, data) => api.put(`/api/flares/${id}`, data);
-export const deleteFlare = (id) => api.delete(`/api/flares/${id}`);
+export const saveFlare = (data) =>
+    axios.post(`${API_BASE}/api/flares`, data, {
+        headers: { "Content-Type": "application/json", ...authHeaders() }
+    });
 
-export default api;
+export const getFlares = () =>
+    axios.get(`${API_BASE}/api/flares`, {
+        headers: authHeaders()
+    });
+
+export const updateFlare = (id, data) =>
+    axios.put(`${API_BASE}/api/flares/${id}`, data, {
+        headers: { "Content-Type": "application/json", ...authHeaders() }
+    });
+
+export const deleteFlare = (id) =>
+    axios.delete(`${API_BASE}/api/flares/${id}`, {
+        headers: authHeaders()
+    });

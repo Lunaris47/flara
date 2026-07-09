@@ -13,7 +13,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         async function loadData() {
-            try {
+			try {
                 const [physRes, mentRes, flareRes] = await Promise.all([
                     getPhysicalLogs(),
                     getMentalLogs(),
