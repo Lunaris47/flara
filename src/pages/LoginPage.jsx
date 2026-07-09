@@ -6,6 +6,7 @@ import "./LoginPage.css";
 export default function LoginPage() {
     const { handleLogin } = useAuth();
     const [form, setForm] = useState({ username: "", password: "" });
+    const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -18,7 +19,7 @@ export default function LoginPage() {
         setError("");
         setLoading(true);
         try {
-            await handleLogin(form);
+            await handleLogin(form, rememberMe);
         } catch (err) {
             setError(err.response?.data?.message || "Invalid username or password.");
         } finally {
@@ -56,6 +57,16 @@ export default function LoginPage() {
                             placeholder="Enter your password"
                             required
                         />
+                    </div>
+
+                    <div className="remember-me">
+                        <input
+                            type="checkbox"
+                            id="rememberMe"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                        />
+                        <label htmlFor="rememberMe">Stay signed in</label>
                     </div>
 
                     {error && <p className="auth-error">{error}</p>}

@@ -16,7 +16,9 @@ const api = axios.create({
 
 // Attach JWT token to every request automatically
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("flara_token");
+    const token =
+        localStorage.getItem("flara_token") ||
+        sessionStorage.getItem("flara_token");
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,6 +32,8 @@ api.interceptors.response.use(
         if (error.response?.status === 401 || error.response?.status === 403) {
             localStorage.removeItem("flara_token");
             localStorage.removeItem("flara_user");
+            sessionStorage.removeItem("flara_token");
+            sessionStorage.removeItem("flara_user");
             window.location.href = "/login";
         }
         return Promise.reject(error);
