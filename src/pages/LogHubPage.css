@@ -1,0 +1,99 @@
+.log-hub-page {
+    min-height: 100vh;
+    background: #1a1a2e;
+    padding-bottom: 24px;
+}
+
+.page-header {
+    padding: 20px 24px 16px;
+    background: #16213e;
+    border-bottom: 1px solid #2d4a7a;
+}
+
+.page-header-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #e8d5b7;
+}
+
+.log-type-section {
+    padding: 20px 20px 0;
+}
+
+.log-type-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.log-type-card {
+    background: #16213e;
+    border: 1px solid #2d4a7a;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.1s;
+}
+
+.log-type-card:hover {
+    border-color: #c8a97e;
+    transform: translateX(2px);
+}
+
+.log-type-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.log-type-label {
+    flex: 1;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #e8d5b7;
+}
+
+.log-type-arrow {
+    color: #c8a97e;
+    font-size: 1rem;
+}
+
+.history-section {
+    padding: 20px 20px 0;
+}
+
+.history-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.history-tab {
+    padding: 8px 16px;
+    background: #16213e;
+    border: 1px solid #2d4a7a;
+    border-radius: 20px;
+    color: #8892a4;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.history-tab.active {
+    color: #c8a97e;
+    border-color: #c8a97e;
+}
+
+.history-coming-soon {
+    color: #4a5568;
+    font-size: 0.88rem;
+    font-style: italic;
+    text-align: center;
+    padding: 32px;
+}

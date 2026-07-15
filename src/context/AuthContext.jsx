@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
         sessionStorage.setItem("flara_token", token);
         sessionStorage.setItem("flara_user", JSON.stringify(userData));
         setUser(userData);
-        navigate("/dashboard");
+        navigate("/home");
     }
 
     async function handleLogin(data, rememberMe = false) {
@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
         }
 
         setUser(userData);
-        navigate("/dashboard");
+        navigate("/home");
     }
 
     function handleLogout() {

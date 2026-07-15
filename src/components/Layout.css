@@ -1,0 +1,70 @@
+/* ===============================
+   APP SHELL
+================================ */
+
+.app-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #1a1a2e;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.app-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 80px;
+}
+
+/* ===============================
+   BOTTOM NAV
+================================ */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    background: #16213e;
+    border-top: 1px solid #2d4a7a;
+    z-index: 1000;
+    height: 64px;
+}
+
+.nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #4a5568;
+    text-decoration: none;
+    transition: color 0.2s;
+    padding: 8px 0;
+}
+
+.nav-item:hover {
+    color: #8892a4;
+}
+
+.nav-item.active {
+    color: #c8a97e;
+}
+
+.nav-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+}
+
+.nav-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
