@@ -1,0 +1,69 @@
+/* SAFETY RATING */
+.safety-rating-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.safety-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: #0f3460;
+    border: 1px solid #2d4a7a;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s;
+    gap: 4px;
+}
+
+.safety-btn:hover {
+    border-color: #c8a97e44;
+}
+
+.safety-btn.selected {
+    border-color: #c8a97e;
+    background: #1a3a6e;
+}
+
+.safety-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #e8d5b7;
+}
+
+.safety-desc {
+    font-size: 0.78rem;
+    color: #8892a4;
+}
+
+/* TRIGGER TAGS */
+.tag-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-btn {
+    padding: 8px 14px;
+    background: #0f3460;
+    border: 1px solid #2d4a7a;
+    border-radius: 20px;
+    color: #a0aec0;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.tag-btn:hover {
+    border-color: #c8a97e44;
+    color: #e8d5b7;
+}
+
+.tag-btn.selected {
+    border-color: #c8a97e;
+    color: #c8a97e;
+    background: #1a3a6e;
+}

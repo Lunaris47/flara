@@ -9,6 +9,8 @@ import TrendsPage from "./pages/TrendsPage";
 import ProfilePage from "./pages/ProfilePage";
 import PhysicalLogPage from "./pages/PhysicalLogPage";
 import MentalLogPage from "./pages/MentalLogPage";
+import MealLogPage from "./pages/MealLogPage";
+import FlareLogPage from "./pages/FlareLogPage";
 
 function ProtectedRoute({ children }) {
     const { user } = useAuth();
@@ -38,6 +40,8 @@ export default function App() {
             {/* LOG FLOW ROUTES - no nav (focused flow) */}
             <Route path="/log/physical" element={<ProtectedRoute><PhysicalLogPage /></ProtectedRoute>} />
             <Route path="/log/mental" element={<ProtectedRoute><MentalLogPage /></ProtectedRoute>} />
+			<Route path="/log/meal" element={<ProtectedRoute><MealLogPage /></ProtectedRoute>} />
+            <Route path="/log/flare" element={<ProtectedRoute><FlareLogPage /></ProtectedRoute>} />
 
             {/* REDIRECTS */}
             <Route path="/dashboard" element={<Navigate to="/home" replace />} />
