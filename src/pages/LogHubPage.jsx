@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import PhysicalLogHistory from "../components/PhysicalLogHistory";
 import MentalLogHistory from "../components/MentalLogHistory";
+import MealLogHistory from "../components/MealLogHistory";
+import FlareHistory from "../components/FlareHistory";
 import "./LogHubPage.css";
 
 export default function LogHubPage() {
@@ -63,12 +65,8 @@ export default function LogHubPage() {
                 <div className="history-content">
                     {activeTab === "physical" && <PhysicalLogHistory />}
                     {activeTab === "mental" && <MentalLogHistory />}
-                    {activeTab === "meals" && (
-                        <div className="history-empty">Meal log history coming soon!</div>
-                    )}
-                    {activeTab === "flares" && (
-                        <div className="history-empty">Flare history coming soon!</div>
-                    )}
+                    {activeTab === "meals" && <MealLogHistory />}
+					{activeTab === "flares" && <FlareHistory />}
                 </div>
             </section>
         </div>
