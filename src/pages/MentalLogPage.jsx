@@ -1,11 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { saveMentalLog } from "../api/api";
+import { saveMentalLog, getMentalLogByDate } from "../api/api";
 import "./LogPage.css";
 
-// ===============================
-// GUIDED STRESS QUESTIONS
-// ===============================
 const STRESS_QUESTIONS = [
     {
         id: "overwhelmed",
@@ -73,7 +70,9 @@ function calculateStressScore(answers) {
 export default function MentalLogPage() {
     const navigate = useNavigate();
 
-    const [phase, setPhase] = useState("stress"); // stress | details | submit
+    const [alreadyLogged, setAlreadyLogged] = useState(false);
+    const [checkingLog, setCheckingLog] = useState(true);
+    const [phase, setPhase] = useState("stress");
     const [stressStep, setStressStep] = useState(0);
     const [stressAnswers, setStressAnswers] = useState({});
     const [details, setDetails] = useState({
@@ -88,11 +87,25 @@ export default function MentalLogPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
+    useEffect(() => {
+        async function checkToday() {
+            try {
+                const today = new Date().toISOString().split("T")[0];
+                const res = await getMentalLogByDate(today);
+                if (res.data) setAlreadyLogged(true);
+            } catch (err) {
+                // No log found for today — that's fine
+            } finally {
+                setCheckingLog(false);
+            }
+        }
+        checkToday();
+    }, []);
+
     function handleStressAnswer(value) {
         const question = STRESS_QUESTIONS[stressStep];
         const newAnswers = { ...stressAnswers, [question.id]: value };
         setStressAnswers(newAnswers);
-
         if (stressStep < STRESS_QUESTIONS.length - 1) {
             setStressStep(stressStep + 1);
         } else {
@@ -102,18 +115,13 @@ export default function MentalLogPage() {
 
     function handleDetailChange(e) {
         const { name, value, type, checked } = e.target;
-        setDetails({
-            ...details,
-            [name]: type === "checkbox" ? checked : value,
-        });
+        setDetails({ ...details, [name]: type === "checkbox" ? checked : value });
     }
 
     async function handleSubmit() {
         setLoading(true);
         setError("");
-
         const stressScore = calculateStressScore(stressAnswers);
-
         try {
             await saveMentalLog({
                 stressScore,
@@ -126,13 +134,65 @@ export default function MentalLogPage() {
                 meditationDone: details.meditationDone,
                 notes: details.notes || null,
             });
-            navigate("/dashboard");
+            navigate("/log");
         } catch (err) {
             setError("Could not save your log. Please try again.");
         } finally {
             setLoading(false);
         }
     }
+
+    // ===============================
+    // CHECKING
+    // ===============================
+    if (checkingLog) {
+        return (
+            <div className="log-page">
+                <div className="log-header">
+                    <button className="back-btn" onClick={() => navigate("/log")}>← Back</button>
+                    <h1 className="log-title">🧠 Mental Check-in</h1>
+                </div>
+                <div className="log-card">
+                    <p style={{ color: "#8892a4", textAlign: "center" }}>Checking today's log...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // ===============================
+    // ALREADY LOGGED
+    // ===============================
+    if (alreadyLogged) {
+    return (
+        <div className="log-page">
+            <div className="log-header">
+                <button className="back-btn" onClick={() => navigate("/log")}>← Back</button>
+                <h1 className="log-title">🧠 Mental Check-in</h1>
+            </div>
+            <div className="log-card">
+                <div className="already-logged">
+                    <span className="already-logged-icon">✅</span>
+                    <h3>Already logged today</h3>
+                    <p>You've already completed your mental check-in for today.</p>
+                    <button
+                        className="submit-btn"
+                        onClick={() => setAlreadyLogged(false)}
+                        style={{ marginTop: 8 }}
+                    >
+                        ✏️ Edit today's log
+                    </button>
+                    <button
+                        className="back-step-btn"
+                        onClick={() => navigate("/log")}
+                        style={{ marginTop: 12 }}
+                    >
+							← Back to Log
+						</button>
+					</div>
+				</div>
+			</div>
+		);
+	}
 
     // ===============================
     // STRESS QUESTION PHASE
@@ -144,18 +204,15 @@ export default function MentalLogPage() {
         return (
             <div className="log-page">
                 <div className="log-header">
-                    <button className="back-btn" onClick={() => navigate("/dashboard")}>← Back</button>
+                    <button className="back-btn" onClick={() => navigate("/log")}>← Back</button>
                     <h1 className="log-title">🧠 Mental Check-in</h1>
                 </div>
-
                 <div className="log-card">
                     <div className="progress-bar">
                         <div className="progress-fill" style={{ width: `${progress}%` }} />
                     </div>
                     <p className="step-counter">Question {stressStep + 1} of {STRESS_QUESTIONS.length}</p>
-
                     <h2 className="guided-question">{question.question}</h2>
-
                     <div className="options-list">
                         {question.options.map((option) => (
                             <button
@@ -167,12 +224,8 @@ export default function MentalLogPage() {
                             </button>
                         ))}
                     </div>
-
                     {stressStep > 0 && (
-                        <button
-                            className="back-step-btn"
-                            onClick={() => setStressStep(stressStep - 1)}
-                        >
+                        <button className="back-step-btn" onClick={() => setStressStep(stressStep - 1)}>
                             ← Previous question
                         </button>
                     )}
@@ -193,10 +246,8 @@ export default function MentalLogPage() {
                     <button className="back-btn" onClick={() => setPhase("stress")}>← Back</button>
                     <h1 className="log-title">🧠 Mental Check-in</h1>
                 </div>
-
                 <div className="log-card">
 
-                    {/* STRESS SCORE RESULT */}
                     <div className="score-result">
                         <div className="score-circle">
                             <span className="score-num">{stressScore}</span>
@@ -208,8 +259,7 @@ export default function MentalLogPage() {
                                 {stressScore <= 2 ? "Low stress — great day 🟢" :
                                  stressScore <= 4 ? "Mild stress 🟡" :
                                  stressScore <= 6 ? "Moderate stress 🟠" :
-                                 stressScore <= 8 ? "High stress 🔴" :
-                                 "Very high stress 🔴"}
+                                 "High stress 🔴"}
                             </p>
                             <p className="score-sublabel" style={{ marginTop: 6, fontSize: "0.8rem", color: "#4a5568" }}>
                                 High stress can affect gut inflammation. Try to build in some rest today if you can.
@@ -217,7 +267,6 @@ export default function MentalLogPage() {
                         </div>
                     </div>
 
-                    {/* MOOD & ANXIETY */}
                     <div className="symptom-section">
                         <h3 className="symptom-section-title">Mood & anxiety</h3>
                         <div className="form-row-log">
@@ -248,7 +297,6 @@ export default function MentalLogPage() {
                         </div>
                     </div>
 
-                    {/* SLEEP */}
                     <div className="symptom-section">
                         <h3 className="symptom-section-title">Sleep last night</h3>
                         <div className="form-row-log">
@@ -280,7 +328,6 @@ export default function MentalLogPage() {
                         </div>
                     </div>
 
-                    {/* STRESS EVENT */}
                     <div className="symptom-section">
                         <h3 className="symptom-section-title">Stress context</h3>
                         <div className="form-group-log">
@@ -299,7 +346,6 @@ export default function MentalLogPage() {
                                 <option value="OTHER">Other</option>
                             </select>
                         </div>
-
                         <label className="checkbox-item" style={{ marginTop: 8 }}>
                             <input
                                 type="checkbox"
@@ -311,7 +357,6 @@ export default function MentalLogPage() {
                         </label>
                     </div>
 
-                    {/* NOTES */}
                     <div className="symptom-section">
                         <div className="form-group-log">
                             <label>What's on your mind today? (optional)</label>
@@ -327,14 +372,9 @@ export default function MentalLogPage() {
 
                     {error && <p className="log-error">{error}</p>}
 
-                    <button
-                        className="submit-btn"
-                        onClick={handleSubmit}
-                        disabled={loading}
-                    >
+                    <button className="submit-btn" onClick={handleSubmit} disabled={loading}>
                         {loading ? "Saving..." : "✓ Save mental check-in"}
                     </button>
-
                 </div>
             </div>
         );

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { savePhysicalLog } from "../api/api";
+import { savePhysicalLog, getPhysicalLogByDate } from "../api/api";
 import "./LogPage.css";
 
 // ===============================
@@ -53,7 +53,6 @@ const PAIN_QUESTIONS = [
     },
 ];
 
-// Calculate pain score from answers
 function calculatePainScore(answers) {
     const total = Object.values(answers).reduce((sum, v) => sum + v, 0);
     const max = 16;
@@ -64,7 +63,9 @@ export default function PhysicalLogPage() {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const [phase, setPhase] = useState("pain"); // pain | symptoms | submit
+    const [alreadyLogged, setAlreadyLogged] = useState(false);
+    const [checkingLog, setCheckingLog] = useState(true);
+    const [phase, setPhase] = useState("pain");
     const [painStep, setPainStep] = useState(0);
     const [painAnswers, setPainAnswers] = useState({});
     const [symptoms, setSymptoms] = useState({
@@ -76,11 +77,9 @@ export default function PhysicalLogPage() {
         nausea: false,
         fever: false,
         bloating: false,
-        // Crohn's specific
         perianalDiscomfort: false,
         mouthSores: false,
         skinIssues: false,
-        // UC specific
         rectalBleeding: false,
         urgency: false,
         tenesmus: false,
@@ -92,11 +91,25 @@ export default function PhysicalLogPage() {
 
     const isCrohns = user?.condition === "CROHNS";
 
+    useEffect(() => {
+        async function checkToday() {
+            try {
+                const today = new Date().toISOString().split("T")[0];
+                const res = await getPhysicalLogByDate(today);
+                if (res.data) setAlreadyLogged(true);
+            } catch (err) {
+                // No log found for today — that's fine
+            } finally {
+                setCheckingLog(false);
+            }
+        }
+        checkToday();
+    }, []);
+
     function handlePainAnswer(value) {
         const question = PAIN_QUESTIONS[painStep];
         const newAnswers = { ...painAnswers, [question.id]: value };
         setPainAnswers(newAnswers);
-
         if (painStep < PAIN_QUESTIONS.length - 1) {
             setPainStep(painStep + 1);
         } else {
@@ -112,44 +125,90 @@ export default function PhysicalLogPage() {
         });
     }
 
-async function handleSubmit() {
-    setLoading(true);
-    setError("");
-
-    const painScore = calculatePainScore(painAnswers);
-    console.log("Submitting physical log with pain score:", painScore);
-    console.log("Token:", localStorage.getItem("flara_token") || sessionStorage.getItem("flara_token"));
-
-    try {
-        const response = await savePhysicalLog({
-            painScore,
-            painAnswers: JSON.stringify(painAnswers),
-            bowelFrequency: symptoms.bowelFrequency ? Number(symptoms.bowelFrequency) : null,
-            bristolType: symptoms.bristolType ? Number(symptoms.bristolType) : null,
-            bloodPresence: symptoms.bloodPresence,
-            fatigue: symptoms.fatigue,
-            jointPain: symptoms.jointPain,
-            nausea: symptoms.nausea,
-            fever: symptoms.fever,
-            bloating: symptoms.bloating,
-            perianalDiscomfort: symptoms.perianalDiscomfort,
-            mouthSores: symptoms.mouthSores,
-            skinIssues: symptoms.skinIssues,
-            rectalBleeding: symptoms.rectalBleeding,
-            urgency: symptoms.urgency,
-            tenesmus: symptoms.tenesmus,
-            energyLevel: symptoms.energyLevel ? Number(symptoms.energyLevel) : null,
-            notes: symptoms.notes || null,
-        });
-        console.log("Save response:", response);
-        navigate("/dashboard");
-    } catch (err) {
-        console.error("Save failed:", err.response?.status, err.response?.data);
-        setError("Could not save your log. Please try again.");
-    } finally {
-        setLoading(false);
+    async function handleSubmit() {
+        setLoading(true);
+        setError("");
+        const painScore = calculatePainScore(painAnswers);
+        try {
+            await savePhysicalLog({
+                painScore,
+                painAnswers: JSON.stringify(painAnswers),
+                bowelFrequency: symptoms.bowelFrequency ? Number(symptoms.bowelFrequency) : null,
+                bristolType: symptoms.bristolType ? Number(symptoms.bristolType) : null,
+                bloodPresence: symptoms.bloodPresence,
+                fatigue: symptoms.fatigue,
+                jointPain: symptoms.jointPain,
+                nausea: symptoms.nausea,
+                fever: symptoms.fever,
+                bloating: symptoms.bloating,
+                perianalDiscomfort: symptoms.perianalDiscomfort,
+                mouthSores: symptoms.mouthSores,
+                skinIssues: symptoms.skinIssues,
+                rectalBleeding: symptoms.rectalBleeding,
+                urgency: symptoms.urgency,
+                tenesmus: symptoms.tenesmus,
+                energyLevel: symptoms.energyLevel ? Number(symptoms.energyLevel) : null,
+                notes: symptoms.notes || null,
+            });
+            navigate("/log");
+        } catch (err) {
+            setError("Could not save your log. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     }
-}
+
+    // ===============================
+    // CHECKING
+    // ===============================
+    if (checkingLog) {
+        return (
+            <div className="log-page">
+                <div className="log-header">
+                    <button className="back-btn" onClick={() => navigate("/log")}>← Back</button>
+                    <h1 className="log-title">🩺 Physical Check-in</h1>
+                </div>
+                <div className="log-card">
+                    <p style={{ color: "#8892a4", textAlign: "center" }}>Checking today's log...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // ===============================
+    // ALREADY LOGGED
+    // ===============================
+    if (alreadyLogged) {
+    return (
+        <div className="log-page">
+            <div className="log-header">
+                <button className="back-btn" onClick={() => navigate("/log")}>← Back</button>
+                <h1 className="log-title">🩺 Physical Check-in</h1>
+            </div>
+            <div className="log-card">
+                <div className="already-logged">
+                    <span className="already-logged-icon">✅</span>
+                    <h3>Already logged today</h3>
+                    <p>You've already completed your physical check-in for today.</p>
+                    <button
+                        className="submit-btn"
+                        onClick={() => setAlreadyLogged(false)}
+                        style={{ marginTop: 8 }}
+                    >
+                        ✏️ Edit today's log
+                    </button>
+                    <button
+                        className="back-step-btn"
+                        onClick={() => navigate("/log")}
+                        style={{ marginTop: 12 }}
+					>
+							← Back to Log
+						</button>
+					</div>
+				</div>
+			</div>
+		);
+	}
 
     // ===============================
     // PAIN QUESTION PHASE
@@ -161,18 +220,15 @@ async function handleSubmit() {
         return (
             <div className="log-page">
                 <div className="log-header">
-                    <button className="back-btn" onClick={() => navigate("/dashboard")}>← Back</button>
+                    <button className="back-btn" onClick={() => navigate("/log")}>← Back</button>
                     <h1 className="log-title">🩺 Physical Check-in</h1>
                 </div>
-
                 <div className="log-card">
                     <div className="progress-bar">
                         <div className="progress-fill" style={{ width: `${progress}%` }} />
                     </div>
                     <p className="step-counter">Question {painStep + 1} of {PAIN_QUESTIONS.length}</p>
-
                     <h2 className="guided-question">{question.question}</h2>
-
                     <div className="options-list">
                         {question.options.map((option) => (
                             <button
@@ -184,12 +240,8 @@ async function handleSubmit() {
                             </button>
                         ))}
                     </div>
-
                     {painStep > 0 && (
-                        <button
-                            className="back-step-btn"
-                            onClick={() => setPainStep(painStep - 1)}
-                        >
+                        <button className="back-step-btn" onClick={() => setPainStep(painStep - 1)}>
                             ← Previous question
                         </button>
                     )}
@@ -210,10 +262,8 @@ async function handleSubmit() {
                     <button className="back-btn" onClick={() => setPhase("pain")}>← Back</button>
                     <h1 className="log-title">🩺 Physical Check-in</h1>
                 </div>
-
                 <div className="log-card">
 
-                    {/* PAIN SCORE RESULT */}
                     <div className="score-result">
                         <div className="score-circle">
                             <span className="score-num">{painScore}</span>
@@ -230,10 +280,8 @@ async function handleSubmit() {
                         </div>
                     </div>
 
-                    {/* BOWEL TRACKING */}
                     <div className="symptom-section">
                         <h3 className="symptom-section-title">Bowel tracking</h3>
-
                         <div className="form-row-log">
                             <div className="form-group-log">
                                 <label>Bowel movements today</label>
@@ -261,7 +309,6 @@ async function handleSubmit() {
                                 </select>
                             </div>
                         </div>
-
                         <div className="form-group-log">
                             <label>Blood presence</label>
                             <select name="bloodPresence" value={symptoms.bloodPresence} onChange={handleSymptomChange}>
@@ -273,7 +320,6 @@ async function handleSubmit() {
                         </div>
                     </div>
 
-                    {/* GENERAL SYMPTOMS */}
                     <div className="symptom-section">
                         <h3 className="symptom-section-title">Symptoms today</h3>
                         <div className="checkbox-grid">
@@ -297,7 +343,6 @@ async function handleSubmit() {
                         </div>
                     </div>
 
-                    {/* CONDITION SPECIFIC */}
                     {isCrohns && (
                         <div className="symptom-section">
                             <h3 className="symptom-section-title">Crohn's specific</h3>
@@ -344,7 +389,6 @@ async function handleSubmit() {
                         </div>
                     )}
 
-                    {/* ENERGY & NOTES */}
                     <div className="symptom-section">
                         <div className="form-group-log">
                             <label>Energy level (1–10)</label>
@@ -372,11 +416,7 @@ async function handleSubmit() {
 
                     {error && <p className="log-error">{error}</p>}
 
-                    <button
-                        className="submit-btn"
-                        onClick={handleSubmit}
-                        disabled={loading}
-                    >
+                    <button className="submit-btn" onClick={handleSubmit} disabled={loading}>
                         {loading ? "Saving..." : "✓ Save physical log"}
                     </button>
                 </div>
