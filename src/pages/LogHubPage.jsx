@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import PhysicalLogHistory from "../components/PhysicalLogHistory";
+import MentalLogHistory from "../components/MentalLogHistory";
 import "./LogHubPage.css";
 
 export default function LogHubPage() {
-    const { user } = useAuth();
     const [activeTab, setActiveTab] = useState("physical");
 
     return (
@@ -44,20 +44,31 @@ export default function LogHubPage() {
             <section className="history-section">
                 <h3 className="section-title">Past logs</h3>
                 <div className="history-tabs">
-                    {["physical", "mental", "meals", "flares"].map((tab) => (
+                    {[
+                        { key: "physical", label: "🩺 Physical" },
+                        { key: "mental", label: "🧠 Mental" },
+                        { key: "meals", label: "🥗 Meals" },
+                        { key: "flares", label: "🔥 Flares" },
+                    ].map((tab) => (
                         <button
-                            key={tab}
-                            className={`history-tab ${activeTab === tab ? "active" : ""}`}
-                            onClick={() => setActiveTab(tab)}
+                            key={tab.key}
+                            className={`history-tab ${activeTab === tab.key ? "active" : ""}`}
+                            onClick={() => setActiveTab(tab.key)}
                         >
-                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                            {tab.label}
                         </button>
                     ))}
                 </div>
+
                 <div className="history-content">
-                    <p className="history-coming-soon">
-                        History for {activeTab} logs coming next — we're building it now!
-                    </p>
+                    {activeTab === "physical" && <PhysicalLogHistory />}
+                    {activeTab === "mental" && <MentalLogHistory />}
+                    {activeTab === "meals" && (
+                        <div className="history-empty">Meal log history coming soon!</div>
+                    )}
+                    {activeTab === "flares" && (
+                        <div className="history-empty">Flare history coming soon!</div>
+                    )}
                 </div>
             </section>
         </div>
