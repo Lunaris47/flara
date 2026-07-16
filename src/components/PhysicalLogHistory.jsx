@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getPhysicalLogs } from "../api/api";
+import { getPhysicalLogs, deletePhysicalLog } from "../api/api";
 import "./LogHistory.css";
 
 export default function PhysicalLogHistory() {
@@ -23,6 +23,16 @@ export default function PhysicalLogHistory() {
 
     function toggle(id) {
         setExpandedId(expandedId === id ? null : id);
+    }
+
+    async function handleDelete(e, id) {
+        e.stopPropagation();
+        try {
+            await deletePhysicalLog(id);
+            setLogs(logs.filter((l) => l.id !== id));
+        } catch (err) {
+            console.error("Failed to delete physical log", err);
+        }
     }
 
     function getBloodLabel(value) {
@@ -145,6 +155,13 @@ export default function PhysicalLogHistory() {
                                         <p>{log.notes}</p>
                                     </div>
                                 )}
+
+                                <button
+                                    className="delete-log-btn"
+                                    onClick={(e) => handleDelete(e, log.id)}
+                                >
+                                    🗑 Delete this entry
+                                </button>
                             </div>
                         )}
                     </div>

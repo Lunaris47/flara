@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getMentalLogs } from "../api/api";
+import { getMentalLogs, deleteMentalLog } from "../api/api";
 import "./LogHistory.css";
 
 export default function MentalLogHistory() {
@@ -23,6 +23,16 @@ export default function MentalLogHistory() {
 
     function toggle(id) {
         setExpandedId(expandedId === id ? null : id);
+    }
+
+    async function handleDelete(e, id) {
+        e.stopPropagation();
+        try {
+            await deleteMentalLog(id);
+            setLogs(logs.filter((l) => l.id !== id));
+        } catch (err) {
+            console.error("Failed to delete mental log", err);
+        }
     }
 
     function getStressLabel(score) {
@@ -124,6 +134,13 @@ export default function MentalLogHistory() {
                                         <p>{log.notes}</p>
                                     </div>
                                 )}
+
+                                <button
+                                    className="delete-log-btn"
+                                    onClick={(e) => handleDelete(e, log.id)}
+                                >
+                                    🗑 Delete this entry
+                                </button>
                             </div>
                         )}
                     </div>

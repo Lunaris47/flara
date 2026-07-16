@@ -136,3 +136,16 @@ export const deleteFlare = (id) =>
     axios.delete(`${API_BASE}/api/flares/${id}`, {
         headers: authHeaders()
     });
+	
+// ===============================
+// DELETION
+// ===============================	
+export const deletePhysicalLog = (id) =>
+    axios.delete(`${API_BASE}/api/logs/physical/${id}`, {
+        headers: authHeaders()
+    });
+
+export const deleteMentalLog = (id) =>
+    axios.delete(`${API_BASE}/api/logs/mental/${id}`, {
+        headers: authHeaders()
+    });	
