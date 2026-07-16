@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { getStoredToken } from "../api/api";
 import "./ProfilePage.css";
 
 // ===============================
@@ -248,6 +249,25 @@ export default function ProfilePage() {
         setExpandedCategory(expandedCategory === category ? null : category);
     }
 
+    async function downloadReport(days) {
+        try {
+            const token = getStoredToken();
+            const response = await fetch(
+                `https://flara-api-production.up.railway.app/api/report/${days}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `flara-health-report-${days}days.pdf`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error("Failed to download report", err);
+        }
+    }
+
     return (
         <div className="profile-page">
             <header className="page-header">
@@ -305,6 +325,25 @@ export default function ProfilePage() {
                         </div>
                     </section>
 
+                    {/* DOCTOR REPORT */}
+                    <section className="settings-section">
+                        <h3 className="section-title">Doctor Report</h3>
+                        <p className="report-description">
+                            Download a PDF summary of your health data to share with your gastroenterologist or care team.
+                        </p>
+                        <div className="report-buttons">
+                            <button className="report-btn" onClick={() => downloadReport(30)}>
+                                📄 Last 30 days
+                            </button>
+                            <button className="report-btn" onClick={() => downloadReport(60)}>
+                                📄 Last 60 days
+                            </button>
+                            <button className="report-btn" onClick={() => downloadReport(90)}>
+                                📄 Last 90 days
+                            </button>
+                        </div>
+                    </section>
+
                     <button className="signout-btn" onClick={handleLogout}>
                         Sign out
                     </button>
@@ -320,8 +359,6 @@ export default function ProfilePage() {
 
                     {EDUCATION_TOPICS.map((topic) => (
                         <div key={topic.category} className="topic-section">
-
-                            {/* CATEGORY HEADER */}
                             <button
                                 className="category-header"
                                 onClick={() => toggleCategory(topic.category)}
@@ -334,13 +371,10 @@ export default function ProfilePage() {
                                 </span>
                             </button>
 
-                            {/* ARTICLES */}
                             {expandedCategory === topic.category && (
                                 <div className="articles-list">
                                     {topic.articles.map((article) => (
                                         <div key={article.id} className="article-card">
-
-                                            {/* ARTICLE HEADER */}
                                             <button
                                                 className="article-header"
                                                 onClick={() => toggleArticle(article.id)}
@@ -357,7 +391,6 @@ export default function ProfilePage() {
                                                 </div>
                                             </button>
 
-                                            {/* ARTICLE CONTENT */}
                                             {expandedArticle === article.id && (
                                                 <div className="article-content">
                                                     {article.content.split("\n\n").map((paragraph, i) => (
