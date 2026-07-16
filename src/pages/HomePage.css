@@ -276,6 +276,73 @@
     font-weight: 600;
 }
 
+/* ===============================
+   FLARE ALERTS
+================================ */
+
+.alerts-section {
+    padding: 16px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.alert-card {
+    background: #16213e;
+    border: 1px solid #2d4a7a;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.alert-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+}
+
+.alert-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.alert-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.alert-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.alert-message {
+    font-size: 0.8rem;
+    color: #8892a4;
+    line-height: 1.5;
+}
+
+.alert-dismiss {
+    background: none;
+    border: none;
+    color: #4a5568;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 2px 6px;
+    flex-shrink: 0;
+    transition: color 0.2s;
+}
+
+.alert-dismiss:hover {
+    color: #8892a4;
+}
+
 @media (max-width: 600px) {
     .stats-row {
         grid-template-columns: repeat(2, 1fr);

@@ -4,12 +4,88 @@ import { getPhysicalLogs, getMentalLogs, getFlares } from "../api/api";
 import { Link } from "react-router-dom";
 import "./HomePage.css";
 
+// ===============================
+// FLARE ALERT LOGIC
+// ===============================
+function checkForAlerts(physicalLogs, mentalLogs) {
+    const alerts = [];
+    const today = new Date();
+
+    // Get last 3 days of logs
+    const last3Days = physicalLogs.filter(log => {
+        const logDate = new Date(log.logDate);
+        const diffDays = Math.floor((today - logDate) / (1000 * 60 * 60 * 24));
+        return diffDays <= 3;
+    });
+
+    const last3MentalDays = mentalLogs.filter(log => {
+        const logDate = new Date(log.logDate);
+        const diffDays = Math.floor((today - logDate) / (1000 * 60 * 60 * 24));
+        return diffDays <= 3;
+    });
+
+    // Check for elevated pain (>= 6) for 2+ consecutive days
+    const highPainDays = last3Days.filter(l => l.painScore !== null && l.painScore >= 6);
+    if (highPainDays.length >= 2) {
+        alerts.push({
+            type: "pain",
+            icon: "🩺",
+            title: "Pain has been elevated",
+            message: "You've reported high pain for 2 or more days. Consider reaching out to your care team if this continues.",
+            color: "#fc8181",
+        });
+    }
+
+    // Check for elevated stress (>= 6) for 3+ consecutive days
+    const highStressDays = last3MentalDays.filter(l => l.stressScore !== null && l.stressScore >= 6);
+    if (highStressDays.length >= 2) {
+        alerts.push({
+            type: "stress",
+            icon: "🧠",
+            title: "Stress has been elevated",
+            message: "High stress can trigger gut inflammation. Try to build in some rest or mindfulness today if you can.",
+            color: "#f6ad55",
+        });
+    }
+
+    // Check for low mood (<=3) for 2+ days
+    const lowMoodDays = last3MentalDays.filter(l => l.moodScore !== null && l.moodScore <= 3);
+    if (lowMoodDays.length >= 2) {
+        alerts.push({
+            type: "mood",
+            icon: "💙",
+            title: "Your mood has been low",
+            message: "Living with IBD is hard. If you're struggling emotionally, reaching out to a therapist or support group can help.",
+            color: "#76e4f7",
+        });
+    }
+
+    // Positive reinforcement — low pain and low stress
+    const recentPhysical = physicalLogs[0];
+    const recentMental = mentalLogs[0];
+    if (
+        recentPhysical?.painScore !== null && recentPhysical?.painScore <= 2 &&
+        recentMental?.stressScore !== null && recentMental?.stressScore <= 3
+    ) {
+        alerts.push({
+            type: "positive",
+            icon: "✨",
+            title: "You're having a good stretch",
+            message: "Low pain and low stress — keep doing what you're doing. This is what remission feels like.",
+            color: "#68d391",
+        });
+    }
+
+    return alerts;
+}
+
 export default function HomePage() {
     const { user } = useAuth();
     const [physicalLogs, setPhysicalLogs] = useState([]);
     const [mentalLogs, setMentalLogs] = useState([]);
     const [flares, setFlares] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [dismissedAlerts, setDismissedAlerts] = useState([]);
 
     useEffect(() => {
         async function loadData() {
@@ -50,13 +126,18 @@ export default function HomePage() {
         return { label: "Be gentle with yourself", color: "#fc8181", emoji: "🔴" };
     }
 
+    function dismissAlert(type) {
+        setDismissedAlerts([...dismissedAlerts, type]);
+    }
+
     const readiness = getReadinessScore();
     const readinessInfo = getReadinessLabel(readiness);
     const today = new Date().toISOString().split("T")[0];
     const todayPhysical = physicalLogs.find(l => l.logDate === today);
     const todayMental = mentalLogs.find(l => l.logDate === today);
+    const alerts = checkForAlerts(physicalLogs, mentalLogs)
+        .filter(a => !dismissedAlerts.includes(a.type));
 
-    // Build recent activity feed
     const recentActivity = [
         ...physicalLogs.slice(0, 3).map(l => ({ ...l, type: "physical" })),
         ...mentalLogs.slice(0, 3).map(l => ({ ...l, type: "mental" })),
@@ -82,6 +163,35 @@ export default function HomePage() {
                 </div>
                 <span className="home-greeting">Hi, {user?.username}</span>
             </header>
+
+            {/* FLARE ALERTS */}
+            {alerts.length > 0 && (
+                <section className="alerts-section">
+                    {alerts.map((alert) => (
+                        <div
+                            key={alert.type}
+                            className="alert-card"
+                            style={{ borderColor: alert.color + "44" }}
+                        >
+                            <div className="alert-content">
+                                <span className="alert-icon">{alert.icon}</span>
+                                <div className="alert-text">
+                                    <p className="alert-title" style={{ color: alert.color }}>
+                                        {alert.title}
+                                    </p>
+                                    <p className="alert-message">{alert.message}</p>
+                                </div>
+                            </div>
+                            <button
+                                className="alert-dismiss"
+                                onClick={() => dismissAlert(alert.type)}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    ))}
+                </section>
+            )}
 
             {/* READINESS SCORE */}
             <section className="readiness-card">
