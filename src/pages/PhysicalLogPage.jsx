@@ -94,7 +94,7 @@ export default function PhysicalLogPage() {
     useEffect(() => {
         async function checkToday() {
             try {
-                const today = new Date().toISOString().split("T")[0];
+                const today = new Date().toLocaleDateString("en-CA");
                 const res = await getPhysicalLogByDate(today);
                 if (res.data) setAlreadyLogged(true);
             } catch (err) {
@@ -131,6 +131,7 @@ export default function PhysicalLogPage() {
         const painScore = calculatePainScore(painAnswers);
         try {
             await savePhysicalLog({
+				logDate: new Date().toLocaleDateString("en-CA"), // formats as YYYY-MM-DD in local time
                 painScore,
                 painAnswers: JSON.stringify(painAnswers),
                 bowelFrequency: symptoms.bowelFrequency ? Number(symptoms.bowelFrequency) : null,

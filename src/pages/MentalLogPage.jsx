@@ -90,7 +90,7 @@ export default function MentalLogPage() {
     useEffect(() => {
         async function checkToday() {
             try {
-                const today = new Date().toISOString().split("T")[0];
+                const today = new Date().toLocaleDateString("en-CA");
                 const res = await getMentalLogByDate(today);
                 if (res.data) setAlreadyLogged(true);
             } catch (err) {
@@ -124,6 +124,7 @@ export default function MentalLogPage() {
         const stressScore = calculateStressScore(stressAnswers);
         try {
             await saveMentalLog({
+				logDate: new Date().toLocaleDateString("en-CA"), // formats as YYYY-MM-DD in local time
                 stressScore,
                 stressAnswers: JSON.stringify(stressAnswers),
                 moodScore: details.moodScore ? Number(details.moodScore) : null,

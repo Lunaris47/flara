@@ -54,6 +54,7 @@ export default function MealLogPage() {
 
         try {
             await saveMealLog({
+				logDate: new Date().toLocaleDateString("en-CA"), // formats as YYYY-MM-DD in local time
                 description: form.description,
                 safetyRating: form.safetyRating,
                 triggerTags: form.selectedTags.join(","),
