@@ -1,12 +1,8 @@
-/* ===============================
-   APP SHELL
-================================ */
-
 .app-shell {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: #1a1a2e;
+    background: var(--bg-primary);
     max-width: 900px;
     margin: 0 auto;
     position: relative;
@@ -18,10 +14,6 @@
     padding-bottom: 80px;
 }
 
-/* ===============================
-   BOTTOM NAV
-================================ */
-
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -30,8 +22,8 @@
     width: 100%;
     max-width: 900px;
     display: flex;
-    background: #16213e;
-    border-top: 1px solid #2d4a7a;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
     z-index: 1000;
     height: 64px;
 }
@@ -43,18 +35,18 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    color: #4a5568;
+    color: var(--text-muted);
     text-decoration: none;
     transition: color 0.2s;
     padding: 8px 0;
 }
 
 .nav-item:hover {
-    color: #8892a4;
+    color: var(--text-secondary);
 }
 
 .nav-item.active {
-    color: #c8a97e;
+    color: var(--accent);
 }
 
 .nav-icon {

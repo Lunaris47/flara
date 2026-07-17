@@ -1,7 +1,7 @@
 .home-page {
     padding: 0 0 24px 0;
     min-height: 100vh;
-    background: #1a1a2e;
+    background: var(--bg-primary);
 }
 
 .home-loading {
@@ -10,7 +10,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #8892a4;
+    color: var(--text-muted);
     gap: 16px;
 }
 
@@ -24,14 +24,13 @@
     50% { opacity: 0.4; }
 }
 
-/* HEADER */
 .home-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 24px 16px;
-    background: #16213e;
-    border-bottom: 1px solid #2d4a7a;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .home-header-left {
@@ -47,22 +46,21 @@
 .home-title {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #c8a97e;
+    color: var(--accent);
     letter-spacing: 1px;
 }
 
 .home-greeting {
     font-size: 0.88rem;
-    color: #8892a4;
+    color: var(--text-muted);
 }
 
-/* READINESS */
 .readiness-card {
-    background: #16213e;
+    background: var(--bg-secondary);
     margin: 20px 20px 0;
     border-radius: 16px;
     padding: 24px;
-    border: 1px solid #2d4a7a;
+    border: 1px solid var(--border-color);
 }
 
 .readiness-score-wrapper {
@@ -87,36 +85,35 @@
 .readiness-number {
     font-size: 1.9rem;
     font-weight: 700;
-    color: #e8d5b7;
+    color: var(--text-primary);
     line-height: 1;
 }
 
 .readiness-label-small {
     font-size: 0.72rem;
-    color: #8892a4;
+    color: var(--text-muted);
 }
 
 .readiness-title {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #e8d5b7;
+    color: var(--text-primary);
     margin-bottom: 6px;
 }
 
 .readiness-subtitle {
     font-size: 0.82rem;
-    color: #8892a4;
+    color: var(--text-muted);
     line-height: 1.5;
 }
 
 .readiness-hint {
     font-size: 0.82rem;
-    color: #c8a97e;
+    color: var(--accent);
     margin-top: 6px;
     font-style: italic;
 }
 
-/* TODAY STATUS */
 .today-status {
     padding: 20px 20px 0;
 }
@@ -128,8 +125,8 @@
 }
 
 .today-card {
-    background: #16213e;
-    border: 1px solid #2d4a7a;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 16px;
     display: flex;
@@ -146,11 +143,11 @@
 }
 
 .today-card.pending {
-    border-color: #2d4a7a;
+    border-color: var(--border-color);
 }
 
 .today-card:hover {
-    border-color: #c8a97e;
+    border-color: var(--accent);
 }
 
 .today-icon {
@@ -160,7 +157,7 @@
 .today-label {
     font-size: 0.82rem;
     font-weight: 600;
-    color: #a0aec0;
+    color: var(--text-secondary);
 }
 
 .today-status-badge {
@@ -173,7 +170,6 @@
     color: #f6ad55;
 }
 
-/* STATS */
 .stats-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -182,11 +178,11 @@
 }
 
 .stat-card {
-    background: #16213e;
+    background: var(--bg-secondary);
     border-radius: 12px;
     padding: 16px 8px;
     text-align: center;
-    border: 1px solid #2d4a7a;
+    border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -199,27 +195,25 @@
 .stat-number {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #c8a97e;
+    color: var(--accent);
 }
 
 .stat-label {
     font-size: 0.7rem;
-    color: #8892a4;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-/* SECTION TITLE */
 .section-title {
     font-size: 0.82rem;
     font-weight: 600;
-    color: #8892a4;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 12px;
 }
 
-/* RECENT ACTIVITY */
 .recent-activity {
     padding: 20px 20px 0;
 }
@@ -231,8 +225,8 @@
 }
 
 .activity-item {
-    background: #16213e;
-    border: 1px solid #2d4a7a;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     padding: 14px 16px;
     display: flex;
@@ -255,12 +249,12 @@
 .activity-type {
     font-size: 0.88rem;
     font-weight: 600;
-    color: #e8d5b7;
+    color: var(--text-primary);
 }
 
 .activity-date {
     font-size: 0.75rem;
-    color: #8892a4;
+    color: var(--text-muted);
 }
 
 .activity-scores {
@@ -272,14 +266,11 @@
 
 .activity-score {
     font-size: 0.75rem;
-    color: #c8a97e;
+    color: var(--accent);
     font-weight: 600;
 }
 
-/* ===============================
-   FLARE ALERTS
-================================ */
-
+/* ALERTS */
 .alerts-section {
     padding: 16px 20px 0;
     display: flex;
@@ -288,8 +279,8 @@
 }
 
 .alert-card {
-    background: #16213e;
-    border: 1px solid #2d4a7a;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 14px 16px;
     display: flex;
@@ -324,14 +315,14 @@
 
 .alert-message {
     font-size: 0.8rem;
-    color: #8892a4;
+    color: var(--text-muted);
     line-height: 1.5;
 }
 
 .alert-dismiss {
     background: none;
     border: none;
-    color: #4a5568;
+    color: var(--text-muted);
     cursor: pointer;
     font-size: 0.85rem;
     padding: 2px 6px;
@@ -340,13 +331,10 @@
 }
 
 .alert-dismiss:hover {
-    color: #8892a4;
+    color: var(--text-secondary);
 }
 
-/* ===============================
-   CONTEXTUAL EDUCATION CARDS
-================================ */
-
+/* CONTEXTUAL CARDS */
 .contextual-cards {
     padding: 16px 20px 0;
     display: flex;
@@ -355,9 +343,9 @@
 }
 
 .contextual-card {
-    background: #16213e;
-    border: 1px solid #2d4a7a;
-    border-left: 4px solid #c8a97e;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent);
     border-radius: 10px;
     padding: 14px 16px;
     display: flex;
@@ -388,20 +376,20 @@
 .contextual-title {
     font-size: 0.88rem;
     font-weight: 700;
-    color: #e8d5b7;
+    color: var(--text-primary);
     line-height: 1.3;
 }
 
 .contextual-summary {
     font-size: 0.78rem;
-    color: #8892a4;
+    color: var(--text-muted);
     line-height: 1.4;
 }
 
 .contextual-read-btn {
     background: none;
     border: none;
-    color: #c8a97e;
+    color: var(--accent);
     font-size: 0.78rem;
     font-weight: 600;
     cursor: pointer;

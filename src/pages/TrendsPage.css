@@ -1,6 +1,6 @@
 .trends-page {
     min-height: 100vh;
-    background: #1a1a2e;
+    background: var(--bg-primary);
 }
 
 .trends-content {
@@ -10,7 +10,6 @@
     gap: 20px;
 }
 
-/* RANGE SELECTOR */
 .range-selector {
     display: flex;
     gap: 8px;
@@ -18,10 +17,10 @@
 
 .range-btn {
     padding: 8px 16px;
-    background: #16213e;
-    border: 1px solid #2d4a7a;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 20px;
-    color: #8892a4;
+    color: var(--text-muted);
     font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
@@ -29,11 +28,10 @@
 }
 
 .range-btn.active {
-    color: #c8a97e;
-    border-color: #c8a97e;
+    color: var(--accent);
+    border-color: var(--accent);
 }
 
-/* NOT ENOUGH DATA */
 .not-enough-data {
     display: flex;
     flex-direction: column;
@@ -51,34 +49,33 @@
 .not-enough-data h3 {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #e8d5b7;
+    color: var(--text-primary);
 }
 
 .not-enough-data p {
     font-size: 0.88rem;
-    color: #8892a4;
+    color: var(--text-muted);
     line-height: 1.6;
     max-width: 280px;
 }
 
-/* CHART SECTIONS */
 .chart-section {
-    background: #16213e;
+    background: var(--bg-secondary);
     border-radius: 16px;
     padding: 20px;
-    border: 1px solid #2d4a7a;
+    border: 1px solid var(--border-color);
 }
 
 .chart-title {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #e8d5b7;
+    color: var(--text-primary);
     margin-bottom: 4px;
 }
 
 .chart-subtitle {
     font-size: 0.78rem;
-    color: #8892a4;
+    color: var(--text-muted);
     margin-bottom: 16px;
     line-height: 1.4;
 }
@@ -89,32 +86,30 @@
 
 .chart-legend-note {
     font-size: 0.75rem;
-    color: #8892a4;
+    color: var(--text-muted);
     margin-top: 8px;
     font-style: italic;
 }
 
-/* TOOLTIP */
 .chart-tooltip {
-    background: #0f3460;
-    border: 1px solid #2d4a7a;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 10px 14px;
     font-size: 0.82rem;
 }
 
 .tooltip-date {
-    color: #c8a97e;
+    color: var(--accent);
     font-weight: 700;
     margin-bottom: 6px;
 }
 
-/* INSIGHTS */
 .insights-section {
-    background: #16213e;
+    background: var(--bg-secondary);
     border-radius: 16px;
     padding: 20px;
-    border: 1px solid #2d4a7a;
+    border: 1px solid var(--border-color);
 }
 
 .insights-list {
@@ -158,7 +153,6 @@
     margin-top: 1px;
 }
 
-/* FLARE SUMMARY */
 .flare-summary-list {
     display: flex;
     flex-direction: column;
@@ -167,10 +161,10 @@
 }
 
 .flare-summary-card {
-    background: #0f1f3d;
+    background: var(--bg-primary);
     border-radius: 10px;
     padding: 14px;
-    border: 1px solid #2d4a7a;
+    border: 1px solid var(--border-color);
 }
 
 .flare-summary-header {
@@ -182,7 +176,7 @@
 .flare-summary-date {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #c8a97e;
+    color: var(--accent);
 }
 
 .flare-summary-severity {
@@ -194,12 +188,11 @@
 .flare-summary-context,
 .flare-summary-triggers {
     font-size: 0.8rem;
-    color: #8892a4;
+    color: var(--text-muted);
     line-height: 1.5;
     margin-top: 4px;
 }
 
-/* COMING SOON */
 .coming-soon {
     display: flex;
     flex-direction: column;
@@ -213,12 +206,12 @@
 .coming-soon h2 {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #e8d5b7;
+    color: var(--text-primary);
 }
 
 .coming-soon p {
     font-size: 0.9rem;
-    color: #8892a4;
+    color: var(--text-muted);
     line-height: 1.6;
     max-width: 300px;
 }

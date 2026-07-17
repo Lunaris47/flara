@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getStoredToken } from "../api/api";
 import { useLocation } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 import "./ProfilePage.css";
 
 // ===============================
@@ -238,13 +239,14 @@ If you're struggling with your medication — side effects, cost, fear, or simpl
 
 export default function ProfilePage() {
     const { user, handleLogout } = useAuth();
-	const location = useLocation();
-	const incomingArticle = location.state?.openArticle;
-	const incomingCategory = location.state?.openCategory;
+    const { darkMode, toggleTheme } = useTheme();
+    const location = useLocation();
+    const incomingArticle = location.state?.openArticle;
+    const incomingCategory = location.state?.openCategory;
 
-	const [activeSection, setActiveSection] = useState(incomingArticle ? "learn" : "profile");
-	const [expandedArticle, setExpandedArticle] = useState(incomingArticle || null);
-	const [expandedCategory, setExpandedCategory] = useState(incomingCategory || null);
+    const [activeSection, setActiveSection] = useState(incomingArticle ? "learn" : "profile");
+    const [expandedArticle, setExpandedArticle] = useState(incomingArticle || null);
+    const [expandedCategory, setExpandedCategory] = useState(incomingCategory || null);
 
     function toggleArticle(id) {
         setExpandedArticle(expandedArticle === id ? null : id);
@@ -326,6 +328,12 @@ export default function ProfilePage() {
                             <div className="settings-item">
                                 <span className="settings-label">Email</span>
                                 <span className="settings-value">{user?.email}</span>
+                            </div>
+                            <div className="settings-item">
+                                <span className="settings-label">Appearance</span>
+                                <button className="theme-toggle" onClick={toggleTheme}>
+                                    {darkMode ? "☀️ Light mode" : "🌙 Dark mode"}
+                                </button>
                             </div>
                         </div>
                     </section>

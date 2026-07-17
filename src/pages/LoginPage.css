@@ -3,18 +3,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #1a1a2e;
+    background: var(--bg-primary);
     padding: 20px;
 }
 
 .auth-card {
-    background: #16213e;
+    background: var(--bg-secondary);
     border-radius: 16px;
     padding: 48px 40px;
     width: 100%;
     max-width: 420px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     text-align: center;
+    border: 1px solid var(--border-color);
 }
 
 .auth-logo {
@@ -25,13 +26,13 @@
 .auth-title {
     font-size: 2rem;
     font-weight: 700;
-    color: #e8d5b7;
+    color: var(--text-primary);
     margin-bottom: 6px;
 }
 
 .auth-subtitle {
     font-size: 0.9rem;
-    color: #8892a4;
+    color: var(--text-muted);
     margin-bottom: 36px;
     font-style: italic;
 }
@@ -48,7 +49,7 @@
     display: block;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #a0aec0;
+    color: var(--text-muted);
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -58,10 +59,10 @@
 .form-group select {
     width: 100%;
     padding: 12px 16px;
-    background: #0f3460;
-    border: 1px solid #2d4a7a;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    color: #e8d5b7;
+    color: var(--text-primary);
     font-size: 0.95rem;
     outline: none;
     transition: border-color 0.2s;
@@ -69,17 +70,17 @@
 }
 
 .form-group input::placeholder {
-    color: #4a5568;
+    color: var(--text-muted);
 }
 
 .form-group input:focus,
 .form-group select:focus {
-    border-color: #c8a97e;
+    border-color: var(--accent);
 }
 
 .form-group select option {
-    background: #0f3460;
-    color: #e8d5b7;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
 }
 
 .auth-error {
@@ -116,11 +117,11 @@
 .auth-switch {
     margin-top: 24px;
     font-size: 0.88rem;
-    color: #8892a4;
+    color: var(--text-muted);
 }
 
 .auth-switch a {
-    color: #c8a97e;
+    color: var(--accent);
     text-decoration: none;
     font-weight: 600;
 }
@@ -130,22 +131,22 @@
 }
 
 .condition-intro {
-    background: #0f3460;
+    background: var(--bg-tertiary);
     border-radius: 8px;
     padding: 16px;
     margin-bottom: 20px;
     font-size: 0.88rem;
-    color: #a0aec0;
+    color: var(--text-muted);
     line-height: 1.6;
 }
 
 .condition-note {
-    background: #0f3460;
+    background: var(--bg-tertiary);
     border-radius: 8px;
     padding: 14px;
     margin-top: 12px;
     font-size: 0.85rem;
-    color: #a0aec0;
+    color: var(--text-muted);
     line-height: 1.6;
 }
 
@@ -153,8 +154,8 @@
     width: 100%;
     padding: 12px;
     background: transparent;
-    color: #8892a4;
-    border: 1px solid #2d4a7a;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 0.95rem;
     cursor: pointer;
@@ -163,8 +164,8 @@
 }
 
 .auth-btn-back:hover {
-    color: #c8a97e;
-    border-color: #c8a97e;
+    color: var(--accent);
+    border-color: var(--accent);
 }
 
 .remember-me {
@@ -177,13 +178,13 @@
 .remember-me input[type="checkbox"] {
     width: 16px;
     height: 16px;
-    accent-color: #c8a97e;
+    accent-color: var(--accent);
     cursor: pointer;
 }
 
 .remember-me label {
     font-size: 0.88rem;
-    color: #8892a4;
+    color: var(--text-muted);
     cursor: pointer;
     text-transform: none;
     letter-spacing: normal;
