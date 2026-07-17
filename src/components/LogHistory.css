@@ -199,6 +199,24 @@
     color: #fc8181 !important;
 }
 
+.meal-day-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.meal-day-header {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 4px;
+}
+
 @media (max-width: 500px) {
     .history-details-grid {
         grid-template-columns: 1fr;

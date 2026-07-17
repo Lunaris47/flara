@@ -379,22 +379,27 @@ export default function TrendsPage() {
 						</section>
 
                         {/* INSIGHTS */}
-                        {insights.length > 0 && (
-                            <section className="insights-section">
-                                <h3 className="chart-title">💡 Insights</h3>
-                                <div className="insights-list">
-                                    {insights.map((insight, i) => (
-                                        <div key={i} className={`insight-card ${insight.type}`}>
-                                            <span className="insight-icon">
-                                                {insight.type === "positive" ? "✅" :
-                                                 insight.type === "warning" ? "⚠️" : "ℹ️"}
-                                            </span>
-                                            <p>{insight.text}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
+                        <section className="insights-section">
+							<h3 className="chart-title">💡 Insights</h3>
+							{insights.length > 0 ? (
+								<div className="insights-list">
+									{insights.map((insight, i) => (
+										<div key={i} className={`insight-card ${insight.type}`}>
+											<span className="insight-icon">
+												{insight.type === "positive" ? "✅" :
+												insight.type === "warning" ? "⚠️" : "ℹ️"}
+											</span>
+											<p>{insight.text}</p>
+										</div>
+									))}
+								</div>
+							) : (
+								<div className="insight-card neutral" style={{ marginTop: 12 }}>
+									<span className="insight-icon">📊</span>
+									<p>Continue logging to generate insights. At least 3 days of data is needed to identify patterns.</p>
+								</div>
+							)}
+						</section>
 
                         {/* FLARE SUMMARY */}
                         {flares.length > 0 && (

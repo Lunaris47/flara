@@ -36,20 +36,12 @@ export default function MealLogHistory() {
     }
 
     function getSafetyLabel(rating) {
-        const map = {
-            SAFE: "✅ Safe",
-            NEUTRAL: "😐 Neutral",
-            TRIGGER: "⚠️ Trigger",
-        };
+        const map = { SAFE: "✅ Safe", NEUTRAL: "😐 Neutral", TRIGGER: "⚠️ Trigger" };
         return map[rating] || "😐 Neutral";
     }
 
     function getSafetyColor(rating) {
-        const map = {
-            SAFE: "#68d391",
-            NEUTRAL: "#f6ad55",
-            TRIGGER: "#fc8181",
-        };
+        const map = { SAFE: "#68d391", NEUTRAL: "#f6ad55", TRIGGER: "#fc8181" };
         return map[rating] || "#f6ad55";
     }
 
@@ -77,90 +69,101 @@ export default function MealLogHistory() {
     if (loading) return <div className="history-loading">Loading...</div>;
     if (logs.length === 0) return <div className="history-empty">No meals logged yet. Log your first meal!</div>;
 
+    // Group logs by date
+    const grouped = logs.reduce((acc, log) => {
+        const date = log.logDate;
+        if (!acc[date]) acc[date] = [];
+        acc[date].push(log);
+        return acc;
+    }, {});
+
+    const sortedDates = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a));
+
     return (
         <div className="log-history">
-            {logs.map((log) => {
-                const isExpanded = expandedId === log.id;
-                const tags = formatTags(log.triggerTags);
+            {sortedDates.map((date) => (
+                <div key={date} className="meal-day-group">
+                    <p className="meal-day-header">{date}</p>
+                    {grouped[date].map((log) => {
+                        const isExpanded = expandedId === log.id;
+                        const tags = formatTags(log.triggerTags);
 
-                return (
-                    <div
-                        key={log.id}
-                        className={`history-row ${isExpanded ? "expanded" : ""}`}
-                        onClick={() => toggle(log.id)}
-                    >
-                        {/* SUMMARY */}
-                        <div className="history-summary">
-                            <div className="history-summary-left">
-                                <span className="history-date">{log.logDate}</span>
-                                <div className="history-pills">
-                                    <span
-                                        className="history-pill"
-                                        style={{ color: getSafetyColor(log.safetyRating) }}
-                                    >
-                                        {getSafetyLabel(log.safetyRating)}
-                                    </span>
-                                    <span className="history-pill meal-desc">
-                                        {log.description?.length > 40
-                                            ? log.description.substring(0, 40) + "..."
-                                            : log.description}
-                                    </span>
-                                </div>
-                            </div>
-                            <span className="history-chevron">{isExpanded ? "▲" : "▼"}</span>
-                        </div>
-
-                        {/* EXPANDED */}
-                        {isExpanded && (
-                            <div className="history-details" onClick={(e) => e.stopPropagation()}>
-
-                                <div className="history-detail-section" style={{ marginBottom: 14 }}>
-                                    <h4>🥗 Meal</h4>
-                                    <p className="meal-full-desc">{log.description}</p>
-                                </div>
-
-                                {tags.length > 0 && (
-                                    <div className="history-detail-section" style={{ marginBottom: 14 }}>
-                                        <h4>⚠️ Trigger ingredients</h4>
-                                        <div className="symptom-tags">
-                                            {tags.map((t) => (
-                                                <span key={t} className="symptom-tag">{formatTagLabel(t)}</span>
-                                            ))}
+                        return (
+                            <div
+                                key={log.id}
+                                className={`history-row ${isExpanded ? "expanded" : ""}`}
+                                onClick={() => toggle(log.id)}
+                            >
+                                <div className="history-summary">
+                                    <div className="history-summary-left">
+                                        <div className="history-pills">
+                                            <span
+                                                className="history-pill"
+                                                style={{ color: getSafetyColor(log.safetyRating) }}
+                                            >
+                                                {getSafetyLabel(log.safetyRating)}
+                                            </span>
+                                            <span className="history-pill meal-desc">
+                                                {log.description?.length > 40
+                                                    ? log.description.substring(0, 40) + "..."
+                                                    : log.description}
+                                            </span>
                                         </div>
                                     </div>
-                                )}
-
-                                <div className="detail-items" style={{ marginBottom: 12 }}>
-                                    <div className="detail-item">
-                                        <span className="detail-label">Safety rating</span>
-                                        <span className="detail-value" style={{ color: getSafetyColor(log.safetyRating) }}>
-                                            {getSafetyLabel(log.safetyRating)}
-                                        </span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="detail-label">Preceded a flare</span>
-                                        <span className="detail-value">{log.precededFlare ? "🔥 Yes" : "No"}</span>
-                                    </div>
+                                    <span className="history-chevron">{isExpanded ? "▲" : "▼"}</span>
                                 </div>
 
-                                {log.notes && (
-                                    <div className="history-notes">
-                                        <h4>📝 Notes</h4>
-                                        <p>{log.notes}</p>
+                                {isExpanded && (
+                                    <div className="history-details" onClick={(e) => e.stopPropagation()}>
+                                        <div className="history-detail-section" style={{ marginBottom: 14 }}>
+                                            <h4>🥗 Meal</h4>
+                                            <p className="meal-full-desc">{log.description}</p>
+                                        </div>
+
+                                        {tags.length > 0 && (
+                                            <div className="history-detail-section" style={{ marginBottom: 14 }}>
+                                                <h4>⚠️ Trigger ingredients</h4>
+                                                <div className="symptom-tags">
+                                                    {tags.map((t) => (
+                                                        <span key={t} className="symptom-tag">{formatTagLabel(t)}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="detail-items" style={{ marginBottom: 12 }}>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Safety rating</span>
+                                                <span className="detail-value" style={{ color: getSafetyColor(log.safetyRating) }}>
+                                                    {getSafetyLabel(log.safetyRating)}
+                                                </span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Preceded a flare</span>
+                                                <span className="detail-value">{log.precededFlare ? "🔥 Yes" : "No"}</span>
+                                            </div>
+                                        </div>
+
+                                        {log.notes && (
+                                            <div className="history-notes">
+                                                <h4>📝 Notes</h4>
+                                                <p>{log.notes}</p>
+                                            </div>
+                                        )}
+
+                                        <button
+                                            className="delete-log-btn"
+                                            onClick={(e) => handleDelete(e, log.id)}
+                                        >
+                                            🗑 Delete this entry
+                                        </button>
                                     </div>
                                 )}
-
-                                <button
-                                    className="delete-log-btn"
-                                    onClick={(e) => handleDelete(e, log.id)}
-                                >
-                                    🗑 Delete this entry
-                                </button>
                             </div>
-                        )}
-                    </div>
-                );
-            })}
+                        );
+                    })}
+                </div>
+            ))}
         </div>
     );
 }

@@ -219,16 +219,21 @@ export default function HomePage() {
     }, []);
 
     function getReadinessScore() {
-        if (!physicalLogs.length || !mentalLogs.length) return null;
-        const lastPhysical = physicalLogs[0];
-        const lastMental = mentalLogs[0];
-        const pain = lastPhysical.painScore || 0;
-        const stress = lastMental.stressScore || 0;
-        const mood = lastMental.moodScore || 5;
-        const sleep = lastMental.sleepQuality || 5;
-        const score = Math.round(100 - (pain * 5) - (stress * 3) + (mood * 3) + (sleep * 2));
-        return Math.max(0, Math.min(100, score));
-    }
+		if (!physicalLogs.length || !mentalLogs.length) return null;
+		const lastPhysical = physicalLogs[0];
+		const lastMental = mentalLogs[0];
+		const pain = lastPhysical.painScore || 0;
+		const stress = lastMental.stressScore || 0;
+		const mood = lastMental.moodScore || 5;
+		const sleep = lastMental.sleepQuality || 5;
+		let score = Math.round(100 - (pain * 5) - (stress * 3) + (mood * 3) + (sleep * 2));
+
+		// Penalize for active flare
+		const hasActiveFlare = flares.some(f => !f.endDate);
+		if (hasActiveFlare) score -= 20;
+
+		return Math.max(0, Math.min(100, score));
+	}
 
     function getReadinessLabel(score) {
         if (score === null) return { label: "No data yet", color: "#4a5568", emoji: "📊" };

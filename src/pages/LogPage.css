@@ -304,6 +304,75 @@
     max-width: 280px;
 }
 
+/* FLARE SPECIFIC */
+.ongoing-flare-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #2d1515;
+    border: 1px solid #fc818144;
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+.ongoing-icon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+
+.ongoing-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #fc8181;
+    margin-bottom: 3px;
+}
+
+.ongoing-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.flare-mode-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.flare-mode-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 16px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s;
+}
+
+.flare-mode-btn:hover {
+    border-color: var(--accent);
+}
+
+.flare-mode-icon {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+}
+
+.flare-mode-label {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.flare-mode-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
 @media (max-width: 600px) {
     .log-page {
         padding: 16px;
