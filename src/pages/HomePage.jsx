@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getPhysicalLogs, getMentalLogs, getFlares } from "../api/api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./HomePage.css";
 
 // ===============================
@@ -11,7 +11,6 @@ function checkForAlerts(physicalLogs, mentalLogs) {
     const alerts = [];
     const today = new Date();
 
-    // Get last 3 days of logs
     const last3Days = physicalLogs.filter(log => {
         const logDate = new Date(log.logDate);
         const diffDays = Math.floor((today - logDate) / (1000 * 60 * 60 * 24));
@@ -24,7 +23,6 @@ function checkForAlerts(physicalLogs, mentalLogs) {
         return diffDays <= 3;
     });
 
-    // Check for elevated pain (>= 6) for 2+ consecutive days
     const highPainDays = last3Days.filter(l => l.painScore !== null && l.painScore >= 6);
     if (highPainDays.length >= 2) {
         alerts.push({
@@ -36,7 +34,6 @@ function checkForAlerts(physicalLogs, mentalLogs) {
         });
     }
 
-    // Check for elevated stress (>= 6) for 3+ consecutive days
     const highStressDays = last3MentalDays.filter(l => l.stressScore !== null && l.stressScore >= 6);
     if (highStressDays.length >= 2) {
         alerts.push({
@@ -48,7 +45,6 @@ function checkForAlerts(physicalLogs, mentalLogs) {
         });
     }
 
-    // Check for low mood (<=3) for 2+ days
     const lowMoodDays = last3MentalDays.filter(l => l.moodScore !== null && l.moodScore <= 3);
     if (lowMoodDays.length >= 2) {
         alerts.push({
@@ -60,7 +56,6 @@ function checkForAlerts(physicalLogs, mentalLogs) {
         });
     }
 
-    // Positive reinforcement — low pain and low stress
     const recentPhysical = physicalLogs[0];
     const recentMental = mentalLogs[0];
     if (
@@ -79,13 +74,97 @@ function checkForAlerts(physicalLogs, mentalLogs) {
     return alerts;
 }
 
+// ===============================
+// CONTEXTUAL EDUCATION CARDS
+// ===============================
+function getContextualCards(physicalLogs, mentalLogs) {
+    const cards = [];
+    const today = new Date();
+
+    const last3Physical = physicalLogs.filter(log => {
+        const diff = Math.floor((today - new Date(log.logDate)) / (1000 * 60 * 60 * 24));
+        return diff <= 3;
+    });
+
+    const last3Mental = mentalLogs.filter(log => {
+        const diff = Math.floor((today - new Date(log.logDate)) / (1000 * 60 * 60 * 24));
+        return diff <= 3;
+    });
+
+    const highStress = last3Mental.filter(l => l.stressScore >= 6);
+    if (highStress.length >= 1) {
+        cards.push({
+            icon: "🧠",
+            title: "Did you know stress can trigger flares?",
+            summary: "High stress activates the gut-brain axis and can increase gut inflammation.",
+            articleId: "stress-gut",
+            color: "#f6ad55",
+        });
+    }
+
+    const poorSleep = last3Mental.filter(l => l.sleepQuality !== null && l.sleepQuality <= 4);
+    if (poorSleep.length >= 1) {
+        cards.push({
+            icon: "😴",
+            title: "Poor sleep and IBD",
+            summary: "Sleep quality directly affects gut inflammation. Here's what the research says.",
+            articleId: "sleep-ibd",
+            color: "#76e4f7",
+        });
+    }
+
+    const highPain = last3Physical.filter(l => l.painScore >= 6);
+    if (highPain.length >= 1) {
+        cards.push({
+            icon: "🔬",
+            title: "Understanding your flare triggers",
+            summary: "Pain has been elevated recently. Learn what commonly triggers IBD flares.",
+            articleId: "what-is-a-flare",
+            color: "#fc8181",
+        });
+    }
+
+    if (cards.length === 0 && physicalLogs.length > 0) {
+        cards.push({
+            icon: "💊",
+            title: "Why staying on medication matters",
+            summary: "One of the most common causes of IBD relapse is stopping medication during remission.",
+            articleId: "medication-adherence",
+            color: "#68d391",
+        });
+    }
+
+    return cards.slice(0, 2);
+}
+
+// ===============================
+// CATEGORY LOOKUP
+// ===============================
+function getCategoryForArticle(articleId) {
+    const map = {
+        "stress-gut": "The Mind-Gut Connection",
+        "sleep-ibd": "The Mind-Gut Connection",
+        "what-is-a-flare": "Understanding IBD",
+        "medication-adherence": "Managing IBD Day-to-Day",
+        "crohns-vs-uc": "Understanding IBD",
+        "remission": "Understanding IBD",
+        "ibd-anxiety": "The Mind-Gut Connection",
+        "ibd-diet": "Nutrition & Food",
+        "hydration": "Nutrition & Food",
+        "doctor-appointments": "Managing IBD Day-to-Day",
+    };
+    return map[articleId] || null;
+}
+
 export default function HomePage() {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [physicalLogs, setPhysicalLogs] = useState([]);
     const [mentalLogs, setMentalLogs] = useState([]);
     const [flares, setFlares] = useState([]);
     const [loading, setLoading] = useState(true);
     const [dismissedAlerts, setDismissedAlerts] = useState([]);
+    const [dismissedCards, setDismissedCards] = useState([]);
 
     useEffect(() => {
         async function loadData() {
@@ -132,11 +211,15 @@ export default function HomePage() {
 
     const readiness = getReadinessScore();
     const readinessInfo = getReadinessLabel(readiness);
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toLocaleDateString("en-CA");
     const todayPhysical = physicalLogs.find(l => l.logDate === today);
     const todayMental = mentalLogs.find(l => l.logDate === today);
+
     const alerts = checkForAlerts(physicalLogs, mentalLogs)
         .filter(a => !dismissedAlerts.includes(a.type));
+
+    const contextualCards = getContextualCards(physicalLogs, mentalLogs)
+        .filter(c => !dismissedCards.includes(c.articleId));
 
     const recentActivity = [
         ...physicalLogs.slice(0, 3).map(l => ({ ...l, type: "physical" })),
@@ -185,6 +268,46 @@ export default function HomePage() {
                             <button
                                 className="alert-dismiss"
                                 onClick={() => dismissAlert(alert.type)}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    ))}
+                </section>
+            )}
+
+            {/* CONTEXTUAL EDUCATION CARDS */}
+            {contextualCards.length > 0 && (
+                <section className="contextual-cards">
+                    {contextualCards.map((card) => (
+                        <div
+                            key={card.articleId}
+                            className="contextual-card"
+                            style={{ borderLeftColor: card.color }}
+                        >
+                            <div className="contextual-card-content">
+                                <span className="contextual-icon">{card.icon}</span>
+                                <div className="contextual-text">
+                                    <p className="contextual-title">{card.title}</p>
+                                    <p className="contextual-summary">{card.summary}</p>
+                                    <button
+                                        className="contextual-read-btn"
+                                        onClick={() => {
+                                            navigate("/profile", {
+                                                state: {
+                                                    openArticle: card.articleId,
+                                                    openCategory: getCategoryForArticle(card.articleId)
+                                                }
+                                            });
+                                        }}
+                                    >
+                                        Read article →
+                                    </button>
+                                </div>
+                            </div>
+                            <button
+                                className="alert-dismiss"
+                                onClick={() => setDismissedCards([...dismissedCards, card.articleId])}
                             >
                                 ✕
                             </button>

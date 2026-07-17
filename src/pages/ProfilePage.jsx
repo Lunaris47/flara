@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getStoredToken } from "../api/api";
+import { useLocation } from "react-router-dom";
 import "./ProfilePage.css";
 
 // ===============================
@@ -237,9 +238,13 @@ If you're struggling with your medication — side effects, cost, fear, or simpl
 
 export default function ProfilePage() {
     const { user, handleLogout } = useAuth();
-    const [activeSection, setActiveSection] = useState("profile");
-    const [expandedArticle, setExpandedArticle] = useState(null);
-    const [expandedCategory, setExpandedCategory] = useState(null);
+	const location = useLocation();
+	const incomingArticle = location.state?.openArticle;
+	const incomingCategory = location.state?.openCategory;
+
+	const [activeSection, setActiveSection] = useState(incomingArticle ? "learn" : "profile");
+	const [expandedArticle, setExpandedArticle] = useState(incomingArticle || null);
+	const [expandedCategory, setExpandedCategory] = useState(incomingCategory || null);
 
     function toggleArticle(id) {
         setExpandedArticle(expandedArticle === id ? null : id);
