@@ -149,3 +149,8 @@ export const deleteMentalLog = (id) =>
     axios.delete(`${API_BASE}/api/logs/mental/${id}`, {
         headers: authHeaders()
     });	
+	
+export const deleteAccount = () =>
+    axios.delete(`${API_BASE}/api/user/delete`, {
+        headers: authHeaders()
+    });	

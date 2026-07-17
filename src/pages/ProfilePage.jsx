@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { getStoredToken } from "../api/api";
+import { getStoredToken, deleteAccount, clearStoredAuth } from "../api/api";
 import { useLocation } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import "./ProfilePage.css";
@@ -247,6 +247,9 @@ export default function ProfilePage() {
     const [activeSection, setActiveSection] = useState(incomingArticle ? "learn" : "profile");
     const [expandedArticle, setExpandedArticle] = useState(incomingArticle || null);
     const [expandedCategory, setExpandedCategory] = useState(incomingCategory || null);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
 
     function toggleArticle(id) {
         setExpandedArticle(expandedArticle === id ? null : id);
@@ -272,6 +275,19 @@ export default function ProfilePage() {
             window.URL.revokeObjectURL(url);
         } catch (err) {
             console.error("Failed to download report", err);
+        }
+    }
+
+    async function handleDeleteAccount() {
+        setDeleteLoading(true);
+        setDeleteError("");
+        try {
+            await deleteAccount();
+            clearStoredAuth();
+            window.location.href = "/login";
+        } catch (err) {
+            setDeleteError("Could not delete account. Please try again.");
+            setDeleteLoading(false);
         }
     }
 
@@ -355,6 +371,42 @@ export default function ProfilePage() {
                                 📄 Last 90 days
                             </button>
                         </div>
+                    </section>
+
+                    {/* DANGER ZONE */}
+                    <section className="settings-section">
+                        <h3 className="section-title">Danger Zone</h3>
+                        {!showDeleteConfirm ? (
+                            <button
+                                className="delete-account-btn"
+                                onClick={() => setShowDeleteConfirm(true)}
+                            >
+                                🗑 Delete my account
+                            </button>
+                        ) : (
+                            <div className="delete-confirm">
+                                <p className="delete-warning">
+                                    ⚠️ This will permanently delete your account and all your health data — logs, flares, meals, and medications. This cannot be undone.
+                                </p>
+                                <p className="delete-warning-sub">Are you sure you want to continue?</p>
+                                {deleteError && <p className="field-error">{deleteError}</p>}
+                                <div className="delete-confirm-buttons">
+                                    <button
+                                        className="delete-confirm-btn"
+                                        onClick={handleDeleteAccount}
+                                        disabled={deleteLoading}
+                                    >
+                                        {deleteLoading ? "Deleting..." : "Yes, delete everything"}
+                                    </button>
+                                    <button
+                                        className="delete-cancel-btn"
+                                        onClick={() => setShowDeleteConfirm(false)}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </section>
 
                     <button className="signout-btn" onClick={handleLogout}>
