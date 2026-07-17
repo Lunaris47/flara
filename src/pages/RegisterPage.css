@@ -1,0 +1,58 @@
+/* FIELD ERRORS & SUCCESS */
+.field-error {
+    font-size: 0.78rem;
+    color: #fc8181;
+    margin-top: 6px;
+}
+
+.field-success {
+    font-size: 0.78rem;
+    color: #68d391;
+    margin-top: 6px;
+}
+
+/* PASSWORD STRENGTH */
+.password-strength {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.strength-bars {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+}
+
+.strength-bar {
+    height: 4px;
+    flex: 1;
+    border-radius: 2px;
+    transition: background 0.2s;
+}
+
+.strength-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color 0.2s;
+}
+
+/* PASSWORD REQUIREMENTS */
+.password-requirements {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.req-met {
+    font-size: 0.75rem;
+    color: #68d391;
+}
+
+.req-unmet {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
