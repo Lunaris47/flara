@@ -322,6 +322,61 @@ export default function TrendsPage() {
                                 </ResponsiveContainer>
                             </div>
                         </section>
+						
+						{/* BOWEL FREQUENCY CHART */}
+						<section className="chart-section">
+							<h3 className="chart-title">🚽 Bowel Frequency</h3>
+							<p className="chart-subtitle">Daily bowel movements — a key clinical indicator for IBD activity</p>
+							<div className="chart-wrapper">
+								<ResponsiveContainer width="100%" height={220}>
+									<LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+										<CartesianGrid strokeDasharray="3 3" stroke="#2d4a7a44" />
+										<XAxis
+											dataKey="date"
+											tick={{ fill: "#8892a4", fontSize: 10 }}
+											tickFormatter={(d) => d.slice(5)}
+										/>
+										<YAxis
+											domain={[0, 'auto']}
+											tick={{ fill: "#8892a4", fontSize: 10 }}
+										/>
+										<Tooltip content={({ active, payload, label }) => {
+											if (active && payload && payload.length) {
+												return (
+													<div className="chart-tooltip">
+														<p className="tooltip-date">{label}</p>
+														{payload.map((entry) => (
+															<p key={entry.name} style={{ color: entry.color }}>
+																{entry.name}: {entry.value} movements
+															</p>
+														))}
+													</div>
+												);
+											}
+											return null;
+										}} />
+										<Legend wrapperStyle={{ fontSize: "11px", color: "#8892a4" }} />
+										{flareDates.map((date) => (
+											<ReferenceLine
+												key={date}
+												x={date}
+												stroke="#fc8181"
+												strokeDasharray="4 2"
+											/>
+										))}
+										<Line
+											type="monotone"
+											dataKey="bowel"
+											stroke="#c8a97e"
+											strokeWidth={2}
+											dot={{ r: 3 }}
+											connectNulls
+											name="Bowel movements"
+										/>
+									</LineChart>
+								</ResponsiveContainer>
+							</div>
+						</section>
 
                         {/* INSIGHTS */}
                         {insights.length > 0 && (
