@@ -156,6 +156,38 @@ function getCategoryForArticle(articleId) {
     return map[articleId] || null;
 }
 
+// ===============================
+// WEEKLY RECAP
+// ===============================
+function getWeeklyRecap(physicalLogs, mentalLogs) {
+    const today = new Date();
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    const weekPhysical = physicalLogs.filter(l => new Date(l.logDate) >= weekAgo);
+    const weekMental = mentalLogs.filter(l => new Date(l.logDate) >= weekAgo);
+
+    if (weekPhysical.length === 0 && weekMental.length === 0) return null;
+
+    const avgPain = weekPhysical.filter(l => l.painScore !== null).length > 0
+        ? (weekPhysical.reduce((s, l) => s + (l.painScore || 0), 0) / weekPhysical.length).toFixed(1)
+        : null;
+
+    const avgStress = weekMental.filter(l => l.stressScore !== null).length > 0
+        ? (weekMental.reduce((s, l) => s + (l.stressScore || 0), 0) / weekMental.length).toFixed(1)
+        : null;
+
+    const avgMood = weekMental.filter(l => l.moodScore !== null).length > 0
+        ? (weekMental.reduce((s, l) => s + (l.moodScore || 0), 0) / weekMental.length).toFixed(1)
+        : null;
+
+    const avgSleep = weekMental.filter(l => l.sleepQuality !== null).length > 0
+        ? (weekMental.reduce((s, l) => s + (l.sleepQuality || 0), 0) / weekMental.length).toFixed(1)
+        : null;
+
+    return { avgPain, avgStress, avgMood, avgSleep, days: weekPhysical.length };
+}
+
 export default function HomePage() {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -220,6 +252,8 @@ export default function HomePage() {
 
     const contextualCards = getContextualCards(physicalLogs, mentalLogs)
         .filter(c => !dismissedCards.includes(c.articleId));
+
+    const weeklyRecap = getWeeklyRecap(physicalLogs, mentalLogs);
 
     const recentActivity = [
         ...physicalLogs.slice(0, 3).map(l => ({ ...l, type: "physical" })),
@@ -383,6 +417,62 @@ export default function HomePage() {
                     <span className="stat-label">Low pain</span>
                 </div>
             </section>
+
+            {/* WEEKLY RECAP */}
+            {weeklyRecap && (
+                <section className="weekly-recap">
+                    <h3 className="section-title">This week's averages</h3>
+                    <div className="recap-card">
+                        <div className="recap-header">
+                            <span className="recap-icon">📊</span>
+                            <div>
+                                <p className="recap-title">Last 7 days</p>
+                                <p className="recap-subtitle">{weeklyRecap.days} day{weeklyRecap.days !== 1 ? "s" : ""} logged</p>
+                            </div>
+                        </div>
+                        <div className="recap-stats">
+                            {weeklyRecap.avgPain && (
+                                <div className="recap-stat">
+                                    <span className="recap-stat-value" style={{
+                                        color: weeklyRecap.avgPain <= 3 ? "#68d391" :
+                                               weeklyRecap.avgPain <= 6 ? "#f6ad55" : "#fc8181"
+                                    }}>
+                                        {weeklyRecap.avgPain}
+                                    </span>
+                                    <span className="recap-stat-label">Avg pain</span>
+                                </div>
+                            )}
+                            {weeklyRecap.avgStress && (
+                                <div className="recap-stat">
+                                    <span className="recap-stat-value" style={{
+                                        color: weeklyRecap.avgStress <= 3 ? "#68d391" :
+                                               weeklyRecap.avgStress <= 6 ? "#f6ad55" : "#fc8181"
+                                    }}>
+                                        {weeklyRecap.avgStress}
+                                    </span>
+                                    <span className="recap-stat-label">Avg stress</span>
+                                </div>
+                            )}
+                            {weeklyRecap.avgMood && (
+                                <div className="recap-stat">
+                                    <span className="recap-stat-value" style={{ color: "#68d391" }}>
+                                        {weeklyRecap.avgMood}
+                                    </span>
+                                    <span className="recap-stat-label">Avg mood</span>
+                                </div>
+                            )}
+                            {weeklyRecap.avgSleep && (
+                                <div className="recap-stat">
+                                    <span className="recap-stat-value" style={{ color: "#76e4f7" }}>
+                                        {weeklyRecap.avgSleep}
+                                    </span>
+                                    <span className="recap-stat-label">Avg sleep</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* RECENT ACTIVITY */}
             {recentActivity.length > 0 && (
