@@ -12,6 +12,7 @@ import PhysicalLogPage from "./pages/PhysicalLogPage";
 import MentalLogPage from "./pages/MentalLogPage";
 import MealLogPage from "./pages/MealLogPage";
 import FlareLogPage from "./pages/FlareLogPage";
+import MedicationLogPage from "./pages/MedicationLogPage";
 
 function ProtectedRoute({ children }) {
     const { user } = useAuth();
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/log/mental" element={<ProtectedRoute><MentalLogPage /></ProtectedRoute>} />
 			<Route path="/log/meal" element={<ProtectedRoute><MealLogPage /></ProtectedRoute>} />
             <Route path="/log/flare" element={<ProtectedRoute><FlareLogPage /></ProtectedRoute>} />
+			<Route path="/log/medication" element={<ProtectedRoute><MedicationLogPage /></ProtectedRoute>} />
 
             {/* REDIRECTS */}
             <Route path="/dashboard" element={<Navigate to="/home" replace />} />

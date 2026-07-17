@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import PhysicalLogHistory from "../components/PhysicalLogHistory";
 import MentalLogHistory from "../components/MentalLogHistory";
 import MealLogHistory from "../components/MealLogHistory";
+import MedicationLogHistory from "../components/MedicationLogHistory";
 import FlareHistory from "../components/FlareHistory";
 import "./LogHubPage.css";
 
@@ -34,6 +35,11 @@ export default function LogHubPage() {
                         <span className="log-type-label">Meal</span>
                         <span className="log-type-arrow">→</span>
                     </Link>
+					<Link to="/log/medication" className="log-type-card">
+						<span className="log-type-icon">💊</span>
+						<span className="log-type-label">Medication</span>
+						<span className="log-type-arrow">→</span>
+					</Link>
                     <Link to="/log/flare" className="log-type-card">
                         <span className="log-type-icon">🔥</span>
                         <span className="log-type-label">Flare</span>
@@ -50,6 +56,7 @@ export default function LogHubPage() {
                         { key: "physical", label: "🩺 Physical" },
                         { key: "mental", label: "🧠 Mental" },
                         { key: "meals", label: "🥗 Meals" },
+						{ key: "medications", label: "💊 Medications" },
                         { key: "flares", label: "🔥 Flares" },
                     ].map((tab) => (
                         <button
@@ -66,6 +73,7 @@ export default function LogHubPage() {
                     {activeTab === "physical" && <PhysicalLogHistory />}
                     {activeTab === "mental" && <MentalLogHistory />}
                     {activeTab === "meals" && <MealLogHistory />}
+					{activeTab === "medications" && <MedicationLogHistory />}
 					{activeTab === "flares" && <FlareHistory />}
                 </div>
             </section>
