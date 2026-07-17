@@ -82,65 +82,65 @@ export default function TrendsPage() {
     // INSIGHTS
     // ===============================
     function generateInsights() {
-        const insights = [];
-        const chartData = buildChartData();
+		const insights = [];
+		const chartData = buildChartData();
 
-        if (chartData.length < 3) return insights;
+		if (chartData.length < 3) return insights;
 
-        // Check stress before flare pattern
-        flares.forEach(flare => {
-            const flareDate = new Date(flare.startDate);
-            const threeDaysBefore = new Date(flareDate);
-            threeDaysBefore.setDate(threeDaysBefore.getDate() - 3);
+		// Check stress before flare pattern
+		flares.forEach(flare => {
+			const flareDate = new Date(flare.startDate);
+			const threeDaysBefore = new Date(flareDate);
+			threeDaysBefore.setDate(threeDaysBefore.getDate() - 3);
 
-            const stressBeforeFlare = chartData.filter(d => {
-                const date = new Date(d.date);
-                return date >= threeDaysBefore && date < flareDate && d.stress !== null;
-            });
+			const stressBeforeFlare = chartData.filter(d => {
+				const date = new Date(d.date);
+				return date >= threeDaysBefore && date < flareDate && d.stress !== null;
+			});
 
-            if (stressBeforeFlare.length > 0) {
-                const avgStress = stressBeforeFlare.reduce((s, d) => s + d.stress, 0) / stressBeforeFlare.length;
-                if (avgStress >= 6) {
-                    insights.push({
-                        type: "warning",
-                        text: `High stress (avg ${avgStress.toFixed(1)}/10) was recorded in the 3 days before your flare on ${flare.startDate}.`,
-                    });
-                }
-            }
-        });
+			if (stressBeforeFlare.length > 0) {
+				const avgStress = stressBeforeFlare.reduce((s, d) => s + d.stress, 0) / stressBeforeFlare.length;
+				if (avgStress >= 6) {
+					insights.push({
+						type: "warning",
+						text: `High stress (avg ${avgStress.toFixed(1)}/10) was recorded in the 3 days before your flare on ${flare.startDate}.`,
+					});
+				}
+			}
+		});
 
-        // Average pain
-        const painDays = chartData.filter(d => d.pain !== null);
-        if (painDays.length > 0) {
-            const avgPain = painDays.reduce((s, d) => s + d.pain, 0) / painDays.length;
-            insights.push({
-                type: avgPain <= 3 ? "positive" : avgPain <= 6 ? "neutral" : "warning",
-                text: `Your average pain score over the last ${activeRange} days is ${avgPain.toFixed(1)}/10.`,
-            });
-        }
+		// Average pain
+		const painDays = chartData.filter(d => d.pain !== null && d.pain !== undefined);
+		if (painDays.length > 0) {
+			const avgPain = painDays.reduce((s, d) => s + d.pain, 0) / painDays.length;
+			insights.push({
+				type: avgPain <= 3 ? "positive" : avgPain <= 6 ? "neutral" : "warning",
+				text: `Your average pain score over the last ${activeRange} days is ${avgPain.toFixed(1)}/10.`,
+			});
+		}
 
-        // Average stress
-        const stressDays = chartData.filter(d => d.stress !== null);
-        if (stressDays.length > 0) {
-            const avgStress = stressDays.reduce((s, d) => s + d.stress, 0) / stressDays.length;
-            insights.push({
-                type: avgStress <= 3 ? "positive" : avgStress <= 6 ? "neutral" : "warning",
-                text: `Your average stress score over the last ${activeRange} days is ${avgStress.toFixed(1)}/10.`,
-            });
-        }
+		// Average stress — only if we have stress data
+		const stressDays = chartData.filter(d => d.stress !== null && d.stress !== undefined);
+		if (stressDays.length > 0) {
+			const avgStress = stressDays.reduce((s, d) => s + d.stress, 0) / stressDays.length;
+			insights.push({
+				type: avgStress <= 3 ? "positive" : avgStress <= 6 ? "neutral" : "warning",
+				text: `Your average stress score over the last ${activeRange} days is ${avgStress.toFixed(1)}/10.`,
+			});
+		}
 
-        // Sleep insight
-        const sleepDays = chartData.filter(d => d.sleep !== null);
-        if (sleepDays.length > 0) {
-            const avgSleep = sleepDays.reduce((s, d) => s + d.sleep, 0) / sleepDays.length;
-            insights.push({
-                type: avgSleep >= 7 ? "positive" : avgSleep >= 5 ? "neutral" : "warning",
-                text: `Your average sleep quality over the last ${activeRange} days is ${avgSleep.toFixed(1)}/10.`,
-            });
-        }
+		// Average sleep — only if we have sleep data
+		const sleepDays = chartData.filter(d => d.sleep !== null && d.sleep !== undefined);
+		if (sleepDays.length > 0) {
+			const avgSleep = sleepDays.reduce((s, d) => s + d.sleep, 0) / sleepDays.length;
+			insights.push({
+				type: avgSleep >= 7 ? "positive" : avgSleep >= 5 ? "neutral" : "warning",
+				text: `Your average sleep quality over the last ${activeRange} days is ${avgSleep.toFixed(1)}/10.`,
+			});
+		}
 
-        return insights;
-    }
+		return insights;
+	}
 
     const chartData = buildChartData();
     const flareDates = getFlareData();
