@@ -44,20 +44,41 @@ export default function FlareHistory() {
         return `${severity}/10 🔴 Very severe`;
     }
 
+    function formatDateTime(dateStr) {
+        if (!dateStr) return "--";
+        const date = new Date(dateStr);
+        return date.toLocaleDateString("en-CA") + " " +
+            date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function getFlareDuration(startStr, endStr) {
+        if (!startStr || !endStr) return null;
+        const start = new Date(startStr);
+        const end = new Date(endStr);
+        const diffMs = end - start;
+        const diffHours = Math.round(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffHours < 24) return `${diffHours}h`;
+        if (diffDays === 1) return "1 day";
+        return `${diffDays} days`;
+    }
+
     if (loading) return <div className="history-loading">Loading...</div>;
     if (flares.length === 0) return (
-		<EmptyState
-			icon="🎉"
-			title="No flares recorded"
-			message="That's a good thing! If you do experience a flare, recording it helps identify patterns and triggers."
-		/>
-	);
+        <EmptyState
+            icon="🎉"
+            title="No flares recorded"
+            message="That's a good thing! If you do experience a flare, recording it helps identify patterns and triggers."
+        />
+    );
 
     return (
         <div className="log-history">
             {flares.map((flare) => {
                 const isExpanded = expandedId === flare.id;
                 const isOngoing = !flare.endDate;
+                const duration = getFlareDuration(flare.startDate, flare.endDate);
 
                 return (
                     <div
@@ -69,16 +90,20 @@ export default function FlareHistory() {
                         <div className="history-summary">
                             <div className="history-summary-left">
                                 <span className="history-date">
-                                    {flare.startDate}
-                                    {flare.endDate ? ` → ${flare.endDate}` : " → ongoing"}
+                                    {formatDateTime(flare.startDate)}
+                                    {flare.endDate
+                                        ? ` → ${formatDateTime(flare.endDate)}`
+                                        : " → ongoing"}
                                 </span>
                                 <div className="history-pills">
                                     <span className="history-pill">
                                         Severity {flare.severity ?? "--"}/10
                                     </span>
-                                    {isOngoing && (
+                                    {isOngoing ? (
                                         <span className="history-pill ongoing-badge">🔥 Ongoing</span>
-                                    )}
+                                    ) : duration ? (
+                                        <span className="history-pill">⏱ {duration}</span>
+                                    ) : null}
                                 </div>
                             </div>
                             <span className="history-chevron">{isExpanded ? "▲" : "▼"}</span>
@@ -87,8 +112,23 @@ export default function FlareHistory() {
                         {/* EXPANDED */}
                         {isExpanded && (
                             <div className="history-details" onClick={(e) => e.stopPropagation()}>
-
                                 <div className="detail-items" style={{ marginBottom: 14 }}>
+                                    <div className="detail-item">
+                                        <span className="detail-label">Started</span>
+                                        <span className="detail-value">{formatDateTime(flare.startDate)}</span>
+                                    </div>
+                                    <div className="detail-item">
+                                        <span className="detail-label">Ended</span>
+                                        <span className="detail-value">
+                                            {flare.endDate ? formatDateTime(flare.endDate) : "🔥 Still ongoing"}
+                                        </span>
+                                    </div>
+                                    {duration && (
+                                        <div className="detail-item">
+                                            <span className="detail-label">Duration</span>
+                                            <span className="detail-value">{duration}</span>
+                                        </div>
+                                    )}
                                     <div className="detail-item">
                                         <span className="detail-label">Severity</span>
                                         <span className="detail-value">{getSeverityLabel(flare.severity)}</span>

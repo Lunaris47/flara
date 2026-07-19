@@ -7,6 +7,7 @@ export default function MealLogHistory() {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [expandedId, setExpandedId] = useState(null);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         async function load() {
@@ -68,16 +69,26 @@ export default function MealLogHistory() {
     }
 
     if (loading) return <div className="history-loading">Loading...</div>;
-    if (logs.length === 0) return (
-		<EmptyState
-			icon="🥗"
-			title="No meals logged yet"
-			message="Logging meals helps you identify food triggers over time. Even a few meals a week adds up."
-		/>
-	);
 
-    // Group logs by date
-    const grouped = logs.reduce((acc, log) => {
+    if (logs.length === 0) return (
+        <EmptyState
+            icon="🥗"
+            title="No meals logged yet"
+            message="Logging meals helps you identify food triggers over time. Even a few meals a week adds up."
+        />
+    );
+
+    // Filter by search
+    const filteredLogs = search
+        ? logs.filter(l =>
+            l.description?.toLowerCase().includes(search.toLowerCase()) ||
+            l.triggerTags?.toLowerCase().includes(search.toLowerCase()) ||
+            l.notes?.toLowerCase().includes(search.toLowerCase())
+        )
+        : logs;
+
+    // Group by date
+    const grouped = filteredLogs.reduce((acc, log) => {
         const date = log.logDate;
         if (!acc[date]) acc[date] = [];
         acc[date].push(log);
@@ -88,6 +99,30 @@ export default function MealLogHistory() {
 
     return (
         <div className="log-history">
+            {/* SEARCH BAR */}
+            <div className="history-search">
+                <input
+                    type="text"
+                    placeholder="Search meals..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="history-search-input"
+                />
+                {search && (
+                    <button className="history-search-clear" onClick={() => setSearch("")}>✕</button>
+                )}
+            </div>
+
+            {/* NO SEARCH RESULTS */}
+            {sortedDates.length === 0 && search && (
+                <EmptyState
+                    icon="🔍"
+                    title="No meals found"
+                    message={`No meals matching "${search}". Try a different search term.`}
+                />
+            )}
+
+            {/* GROUPED MEALS */}
             {sortedDates.map((date) => (
                 <div key={date} className="meal-day-group">
                     <p className="meal-day-header">{date}</p>

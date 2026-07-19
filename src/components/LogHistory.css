@@ -217,6 +217,51 @@
     margin-bottom: 4px;
 }
 
+/* SEARCH */
+.history-search {
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.history-search-input {
+    width: 100%;
+    padding: 10px 36px 10px 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.88rem;
+    outline: none;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.history-search-input:focus {
+    border-color: var(--accent);
+}
+
+.history-search-input::placeholder {
+    color: var(--text-muted);
+}
+
+.history-search-clear {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 4px;
+}
+
+.history-search-clear:hover {
+    color: var(--text-primary);
+}
+
 @media (max-width: 500px) {
     .history-details-grid {
         grid-template-columns: 1fr;
