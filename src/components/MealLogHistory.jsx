@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getMealLogs, deleteMealLog } from "../api/api";
+import EmptyState from "./EmptyState";
 import "./LogHistory.css";
 
 export default function MealLogHistory() {
@@ -67,7 +68,13 @@ export default function MealLogHistory() {
     }
 
     if (loading) return <div className="history-loading">Loading...</div>;
-    if (logs.length === 0) return <div className="history-empty">No meals logged yet. Log your first meal!</div>;
+    if (logs.length === 0) return (
+		<EmptyState
+			icon="🥗"
+			title="No meals logged yet"
+			message="Logging meals helps you identify food triggers over time. Even a few meals a week adds up."
+		/>
+	);
 
     // Group logs by date
     const grouped = logs.reduce((acc, log) => {

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getPhysicalLogs, getMentalLogs, getFlares } from "../api/api";
 import { Link, useNavigate } from "react-router-dom";
+import EmptyState from "../components/EmptyState";
 import "./HomePage.css";
 
 // ===============================
@@ -188,6 +189,9 @@ function getWeeklyRecap(physicalLogs, mentalLogs) {
     return { avgPain, avgStress, avgMood, avgSleep, days: weekPhysical.length };
 }
 
+// ===============================
+// STREAK
+// ===============================
 function getStreak(physicalLogs) {
     if (physicalLogs.length === 0) return 0;
 
@@ -197,7 +201,6 @@ function getStreak(physicalLogs) {
     let streak = 0;
     let current = new Date();
 
-    // If today isn't logged yet, start checking from yesterday
     if (!logDates.has(today)) {
         current.setDate(current.getDate() - 1);
     }
@@ -246,21 +249,18 @@ export default function HomePage() {
     }, []);
 
     function getReadinessScore() {
-		if (!physicalLogs.length || !mentalLogs.length) return null;
-		const lastPhysical = physicalLogs[0];
-		const lastMental = mentalLogs[0];
-		const pain = lastPhysical.painScore || 0;
-		const stress = lastMental.stressScore || 0;
-		const mood = lastMental.moodScore || 5;
-		const sleep = lastMental.sleepQuality || 5;
-		let score = Math.round(100 - (pain * 5) - (stress * 3) + (mood * 3) + (sleep * 2));
-
-		// Penalize for active flare
-		const hasActiveFlare = flares.some(f => !f.endDate);
-		if (hasActiveFlare) score -= 20;
-
-		return Math.max(0, Math.min(100, score));
-	}
+        if (!physicalLogs.length || !mentalLogs.length) return null;
+        const lastPhysical = physicalLogs[0];
+        const lastMental = mentalLogs[0];
+        const pain = lastPhysical.painScore || 0;
+        const stress = lastMental.stressScore || 0;
+        const mood = lastMental.moodScore || 5;
+        const sleep = lastMental.sleepQuality || 5;
+        let score = Math.round(100 - (pain * 5) - (stress * 3) + (mood * 3) + (sleep * 2));
+        const hasActiveFlare = flares.some(f => !f.endDate);
+        if (hasActiveFlare) score -= 20;
+        return Math.max(0, Math.min(100, score));
+    }
 
     function getReadinessLabel(score) {
         if (score === null) return { label: "No data yet", color: "#4a5568", emoji: "📊" };
@@ -286,8 +286,7 @@ export default function HomePage() {
         .filter(c => !dismissedCards.includes(c.articleId));
 
     const weeklyRecap = getWeeklyRecap(physicalLogs, mentalLogs);
-	
-	const streak = getStreak(physicalLogs);
+    const streak = getStreak(physicalLogs);
 
     const recentActivity = [
         ...physicalLogs.slice(0, 3).map(l => ({ ...l, type: "physical" })),
@@ -314,19 +313,19 @@ export default function HomePage() {
                 </div>
                 <span className="home-greeting">Hi, {user?.username}</span>
             </header>
-			
-			{/* STREAK */}
-			{streak > 0 && (
-				<section className="streak-banner">
-					<span className="streak-fire">🔥</span>
-					<div className="streak-text">
-						<p className="streak-number">{streak} day{streak !== 1 ? "s" : ""} in a row</p>
-						<p className="streak-label">Keep it up — consistency is everything</p>
-					</div>
-					{streak >= 7 && <span className="streak-badge">⭐ Week streak!</span>}
-					{streak >= 30 && <span className="streak-badge">🏆 Month streak!</span>}
-				</section>
-			)}
+
+            {/* STREAK */}
+            {streak > 0 && (
+                <section className="streak-banner">
+                    <span className="streak-fire">🔥</span>
+                    <div className="streak-text">
+                        <p className="streak-number">{streak} day{streak !== 1 ? "s" : ""} in a row</p>
+                        <p className="streak-label">Keep it up — consistency is everything</p>
+                    </div>
+                    {streak >= 30 && <span className="streak-badge">🏆 Month streak!</span>}
+                    {streak >= 7 && streak < 30 && <span className="streak-badge">⭐ Week streak!</span>}
+                </section>
+            )}
 
             {/* FLARE ALERTS */}
             {alerts.length > 0 && (
@@ -340,18 +339,11 @@ export default function HomePage() {
                             <div className="alert-content">
                                 <span className="alert-icon">{alert.icon}</span>
                                 <div className="alert-text">
-                                    <p className="alert-title" style={{ color: alert.color }}>
-                                        {alert.title}
-                                    </p>
+                                    <p className="alert-title" style={{ color: alert.color }}>{alert.title}</p>
                                     <p className="alert-message">{alert.message}</p>
                                 </div>
                             </div>
-                            <button
-                                className="alert-dismiss"
-                                onClick={() => dismissAlert(alert.type)}
-                            >
-                                ✕
-                            </button>
+                            <button className="alert-dismiss" onClick={() => dismissAlert(alert.type)}>✕</button>
                         </div>
                     ))}
                 </section>
@@ -421,19 +413,19 @@ export default function HomePage() {
                 <h3 className="section-title">Today's check-ins</h3>
                 <div className="today-cards">
                     <Link to="/log/physical" className={`today-card ${todayPhysical ? "done" : "pending"}`}>
-						<span className="today-icon">🩺</span>
-						<span className="today-label">Physical</span>
-						<span className="today-status-badge">
-							{todayPhysical ? "✓ Logged" : "Not yet"}
-						</span>
-					</Link>
-					<Link to="/log/mental" className={`today-card ${todayMental ? "done" : "pending"}`}>
-						<span className="today-icon">🧠</span>
-						<span className="today-label">Mental</span>
-						<span className="today-status-badge">
-							{todayMental ? "✓ Logged" : "Not yet"}
-						</span>
-					</Link>
+                        <span className="today-icon">🩺</span>
+                        <span className="today-label">Physical</span>
+                        <span className="today-status-badge">
+                            {todayPhysical ? "✓ Logged" : "Not yet"}
+                        </span>
+                    </Link>
+                    <Link to="/log/mental" className={`today-card ${todayMental ? "done" : "pending"}`}>
+                        <span className="today-icon">🧠</span>
+                        <span className="today-label">Mental</span>
+                        <span className="today-status-badge">
+                            {todayMental ? "✓ Logged" : "Not yet"}
+                        </span>
+                    </Link>
                 </div>
             </section>
 
@@ -522,9 +514,15 @@ export default function HomePage() {
             )}
 
             {/* RECENT ACTIVITY */}
-            {recentActivity.length > 0 && (
-                <section className="recent-activity">
-                    <h3 className="section-title">Recent activity</h3>
+            <section className="recent-activity">
+                <h3 className="section-title">Recent activity</h3>
+                {recentActivity.length === 0 ? (
+                    <EmptyState
+                        icon="🌿"
+                        title="No activity yet"
+                        message="Start your first daily check-in to see your activity here."
+                    />
+                ) : (
                     <div className="activity-feed">
                         {recentActivity.map((entry) => (
                             <div key={`${entry.type}-${entry.id}`} className="activity-item">
@@ -554,8 +552,8 @@ export default function HomePage() {
                             </div>
                         ))}
                     </div>
-                </section>
-            )}
+                )}
+            </section>
 
         </div>
     );

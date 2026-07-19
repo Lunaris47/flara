@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getFlares, deleteFlare } from "../api/api";
+import EmptyState from "./EmptyState";
 import "./LogHistory.css";
 
 export default function FlareHistory() {
@@ -44,7 +45,13 @@ export default function FlareHistory() {
     }
 
     if (loading) return <div className="history-loading">Loading...</div>;
-    if (flares.length === 0) return <div className="history-empty">No flares recorded yet.</div>;
+    if (flares.length === 0) return (
+		<EmptyState
+			icon="🎉"
+			title="No flares recorded"
+			message="That's a good thing! If you do experience a flare, recording it helps identify patterns and triggers."
+		/>
+	);
 
     return (
         <div className="log-history">

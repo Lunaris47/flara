@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getMedicationLogs, deleteMedicationLog } from "../api/api";
+import EmptyState from "./EmptyState";
 import "./LogHistory.css";
 
 export default function MedicationLogHistory() {
@@ -49,7 +50,13 @@ export default function MedicationLogHistory() {
     }
 
     if (loading) return <div className="history-loading">Loading...</div>;
-    if (logs.length === 0) return <div className="history-empty">No medications logged yet.</div>;
+    if (logs.length === 0) return (
+		<EmptyState
+			icon="💊"
+			title="No medications logged yet"
+			message="Track your medications to monitor adherence and note any side effects over time."
+		/>
+	);
 
     return (
         <div className="log-history">

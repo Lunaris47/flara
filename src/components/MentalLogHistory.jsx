@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getMentalLogs, deleteMentalLog } from "../api/api";
+import EmptyState from "./EmptyState";
 import "./LogHistory.css";
 
 export default function MentalLogHistory() {
@@ -57,7 +58,13 @@ export default function MentalLogHistory() {
     }
 
     if (loading) return <div className="history-loading">Loading...</div>;
-    if (logs.length === 0) return <div className="history-empty">No mental check-ins yet. Log your first one!</div>;
+    if (logs.length === 0) return (
+		<EmptyState
+			icon="🧠"
+			title="No mental check-ins yet"
+			message="Tracking your stress, mood, and sleep alongside physical symptoms is what makes Flara different."
+		/>
+	);
 
     return (
         <div className="log-history">

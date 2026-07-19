@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getPhysicalLogs, deletePhysicalLog } from "../api/api";
+import EmptyState from "./EmptyState";
 import "./LogHistory.css";
 
 export default function PhysicalLogHistory() {
@@ -78,7 +79,13 @@ export default function PhysicalLogHistory() {
     }
 
     if (loading) return <div className="history-loading">Loading...</div>;
-    if (logs.length === 0) return <div className="history-empty">No physical logs yet. Start your first check-in!</div>;
+    if (logs.length === 0) return (
+		<EmptyState
+			icon="🩺"
+			title="No physical logs yet"
+			message="Start logging your symptoms daily to track patterns and build your health history."
+		/>
+	);
 
     return (
         <div className="log-history">

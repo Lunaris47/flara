@@ -4,6 +4,7 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid,
     Tooltip, Legend, ResponsiveContainer, ReferenceLine
 } from "recharts";
+import EmptyState from "../components/EmptyState";
 import "./TrendsPage.css";
 
 export default function TrendsPage() {
@@ -200,12 +201,12 @@ export default function TrendsPage() {
                 </div>
 
                 {!hasEnoughData ? (
-                    <div className="not-enough-data">
-                        <span className="not-enough-icon">📊</span>
-                        <h3>Not enough data yet</h3>
-                        <p>Log at least 2 days of physical and mental check-ins to see your trends.</p>
-                    </div>
-                ) : (
+					<EmptyState
+						icon="📈"
+						title="Not enough data yet"
+						message="Log at least 2 days of physical and mental check-ins to see your mind-gut correlation charts."
+					/>
+				) : (
                     <>
                         {/* MIND-GUT CORRELATION CHART */}
                         <section className="chart-section">
