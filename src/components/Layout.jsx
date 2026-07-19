@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import PageTransition from "./PageTransition";
 import "./Layout.css";
 
 export default function Layout({ children }) {
@@ -6,7 +7,9 @@ export default function Layout({ children }) {
         <div className="app-shell">
             {/* MAIN CONTENT */}
             <main className="app-content">
-                {children}
+				<PageTransition key={location.pathname}>
+					{children}
+				</PageTransition>	
             </main>
 
             {/* BOTTOM NAV */}
