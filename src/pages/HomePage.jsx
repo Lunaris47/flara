@@ -188,6 +188,33 @@ function getWeeklyRecap(physicalLogs, mentalLogs) {
     return { avgPain, avgStress, avgMood, avgSleep, days: weekPhysical.length };
 }
 
+function getStreak(physicalLogs) {
+    if (physicalLogs.length === 0) return 0;
+
+    const today = new Date().toLocaleDateString("en-CA");
+    const logDates = new Set(physicalLogs.map(l => l.logDate));
+
+    let streak = 0;
+    let current = new Date();
+
+    // If today isn't logged yet, start checking from yesterday
+    if (!logDates.has(today)) {
+        current.setDate(current.getDate() - 1);
+    }
+
+    while (true) {
+        const dateStr = current.toLocaleDateString("en-CA");
+        if (logDates.has(dateStr)) {
+            streak++;
+            current.setDate(current.getDate() - 1);
+        } else {
+            break;
+        }
+    }
+
+    return streak;
+}
+
 export default function HomePage() {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -259,6 +286,8 @@ export default function HomePage() {
         .filter(c => !dismissedCards.includes(c.articleId));
 
     const weeklyRecap = getWeeklyRecap(physicalLogs, mentalLogs);
+	
+	const streak = getStreak(physicalLogs);
 
     const recentActivity = [
         ...physicalLogs.slice(0, 3).map(l => ({ ...l, type: "physical" })),
@@ -285,6 +314,19 @@ export default function HomePage() {
                 </div>
                 <span className="home-greeting">Hi, {user?.username}</span>
             </header>
+			
+			{/* STREAK */}
+			{streak > 0 && (
+				<section className="streak-banner">
+					<span className="streak-fire">🔥</span>
+					<div className="streak-text">
+						<p className="streak-number">{streak} day{streak !== 1 ? "s" : ""} in a row</p>
+						<p className="streak-label">Keep it up — consistency is everything</p>
+					</div>
+					{streak >= 7 && <span className="streak-badge">⭐ Week streak!</span>}
+					{streak >= 30 && <span className="streak-badge">🏆 Month streak!</span>}
+				</section>
+			)}
 
             {/* FLARE ALERTS */}
             {alerts.length > 0 && (

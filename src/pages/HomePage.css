@@ -468,6 +468,52 @@
     text-align: center;
 }
 
+/* ===============================
+   STREAK BANNER
+================================ */
+
+.streak-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 16px 20px 0;
+    background: linear-gradient(135deg, #2d1a0e, #1a2d0e);
+    border: 1px solid #c8a97e44;
+    border-radius: 12px;
+    padding: 14px 18px;
+}
+
+.streak-fire {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.streak-text {
+    flex: 1;
+}
+
+.streak-number {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #c8a97e;
+}
+
+.streak-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.streak-badge {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #c8a97e;
+    background: #c8a97e22;
+    padding: 4px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+}
+
 @media (max-width: 600px) {
     .stats-row {
         grid-template-columns: repeat(2, 1fr);
