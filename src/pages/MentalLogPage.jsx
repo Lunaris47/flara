@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { saveMentalLog, getMentalLogByDate } from "../api/api";
+import Toast from "../components/Toast";
 import "./LogPage.css";
 
 const STRESS_QUESTIONS = [
@@ -63,8 +64,7 @@ const STRESS_QUESTIONS = [
 
 function calculateStressScore(answers) {
     const total = Object.values(answers).reduce((sum, v) => sum + v, 0);
-    const max = 20;
-    return Math.round((total / max) * 10);
+    return Math.round((total / 20) * 10);
 }
 
 export default function MentalLogPage() {
@@ -86,6 +86,7 @@ export default function MentalLogPage() {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showToast, setShowToast] = useState(false);
 
     useEffect(() => {
         async function checkToday() {
@@ -94,7 +95,7 @@ export default function MentalLogPage() {
                 const res = await getMentalLogByDate(today);
                 if (res.data) setAlreadyLogged(true);
             } catch (err) {
-                // No log found for today — that's fine
+                // No log found
             } finally {
                 setCheckingLog(false);
             }
@@ -124,7 +125,7 @@ export default function MentalLogPage() {
         const stressScore = calculateStressScore(stressAnswers);
         try {
             await saveMentalLog({
-				logDate: new Date().toLocaleDateString("en-CA"), // formats as YYYY-MM-DD in local time
+                logDate: new Date().toLocaleDateString("en-CA"),
                 stressScore,
                 stressAnswers: JSON.stringify(stressAnswers),
                 moodScore: details.moodScore ? Number(details.moodScore) : null,
@@ -135,7 +136,8 @@ export default function MentalLogPage() {
                 meditationDone: details.meditationDone,
                 notes: details.notes || null,
             });
-            navigate("/log");
+            setShowToast(true);
+            setTimeout(() => navigate("/log"), 2000);
         } catch (err) {
             setError("Could not save your log. Please try again.");
         } finally {
@@ -143,9 +145,6 @@ export default function MentalLogPage() {
         }
     }
 
-    // ===============================
-    // CHECKING
-    // ===============================
     if (checkingLog) {
         return (
             <div className="log-page">
@@ -154,54 +153,39 @@ export default function MentalLogPage() {
                     <h1 className="log-title">🧠 Mental Check-in</h1>
                 </div>
                 <div className="log-card">
-                    <p style={{ color: "#8892a4", textAlign: "center" }}>Checking today's log...</p>
+                    <p style={{ color: "var(--text-muted)", textAlign: "center" }}>Checking today's log...</p>
                 </div>
             </div>
         );
     }
 
-    // ===============================
-    // ALREADY LOGGED
-    // ===============================
     if (alreadyLogged) {
-    return (
-        <div className="log-page">
-            <div className="log-header">
-                <button className="back-btn" onClick={() => navigate("/log")}>← Back</button>
-                <h1 className="log-title">🧠 Mental Check-in</h1>
+        return (
+            <div className="log-page">
+                <div className="log-header">
+                    <button className="back-btn" onClick={() => navigate("/log")}>← Back</button>
+                    <h1 className="log-title">🧠 Mental Check-in</h1>
+                </div>
+                <div className="log-card">
+                    <div className="already-logged">
+                        <span className="already-logged-icon">✅</span>
+                        <h3>Already logged today</h3>
+                        <p>You've already completed your mental check-in for today.</p>
+                        <button className="submit-btn" onClick={() => setAlreadyLogged(false)} style={{ marginTop: 8 }}>
+                            ✏️ Edit today's log
+                        </button>
+                        <button className="back-step-btn" onClick={() => navigate("/log")} style={{ marginTop: 12 }}>
+                            ← Back to Log
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div className="log-card">
-                <div className="already-logged">
-                    <span className="already-logged-icon">✅</span>
-                    <h3>Already logged today</h3>
-                    <p>You've already completed your mental check-in for today.</p>
-                    <button
-                        className="submit-btn"
-                        onClick={() => setAlreadyLogged(false)}
-                        style={{ marginTop: 8 }}
-                    >
-                        ✏️ Edit today's log
-                    </button>
-                    <button
-                        className="back-step-btn"
-                        onClick={() => navigate("/log")}
-                        style={{ marginTop: 12 }}
-                    >
-							← Back to Log
-						</button>
-					</div>
-				</div>
-			</div>
-		);
-	}
+        );
+    }
 
-    // ===============================
-    // STRESS QUESTION PHASE
-    // ===============================
     if (phase === "stress") {
         const question = STRESS_QUESTIONS[stressStep];
         const progress = (stressStep / STRESS_QUESTIONS.length) * 100;
-
         return (
             <div className="log-page">
                 <div className="log-header">
@@ -216,11 +200,7 @@ export default function MentalLogPage() {
                     <h2 className="guided-question">{question.question}</h2>
                     <div className="options-list">
                         {question.options.map((option) => (
-                            <button
-                                key={option.label}
-                                className="option-btn"
-                                onClick={() => handleStressAnswer(option.value)}
-                            >
+                            <button key={option.label} className="option-btn" onClick={() => handleStressAnswer(option.value)}>
                                 {option.label}
                             </button>
                         ))}
@@ -235,12 +215,8 @@ export default function MentalLogPage() {
         );
     }
 
-    // ===============================
-    // DETAILS PHASE
-    // ===============================
     if (phase === "details") {
         const stressScore = calculateStressScore(stressAnswers);
-
         return (
             <div className="log-page">
                 <div className="log-header">
@@ -248,7 +224,6 @@ export default function MentalLogPage() {
                     <h1 className="log-title">🧠 Mental Check-in</h1>
                 </div>
                 <div className="log-card">
-
                     <div className="score-result">
                         <div className="score-circle">
                             <span className="score-num">{stressScore}</span>
@@ -259,10 +234,9 @@ export default function MentalLogPage() {
                             <p className="score-sublabel">
                                 {stressScore <= 2 ? "Low stress — great day 🟢" :
                                  stressScore <= 4 ? "Mild stress 🟡" :
-                                 stressScore <= 6 ? "Moderate stress 🟠" :
-                                 "High stress 🔴"}
+                                 stressScore <= 6 ? "Moderate stress 🟠" : "High stress 🔴"}
                             </p>
-                            <p className="score-sublabel" style={{ marginTop: 6, fontSize: "0.8rem", color: "#4a5568" }}>
+                            <p className="score-sublabel" style={{ marginTop: 6, fontSize: "0.8rem", color: "var(--text-muted)" }}>
                                 High stress can affect gut inflammation. Try to build in some rest today if you can.
                             </p>
                         </div>
@@ -273,27 +247,11 @@ export default function MentalLogPage() {
                         <div className="form-row-log">
                             <div className="form-group-log">
                                 <label>Mood today (1–10)</label>
-                                <input
-                                    type="number"
-                                    name="moodScore"
-                                    value={details.moodScore}
-                                    onChange={handleDetailChange}
-                                    placeholder="1 = very low, 10 = great"
-                                    min="1"
-                                    max="10"
-                                />
+                                <input type="number" name="moodScore" value={details.moodScore} onChange={handleDetailChange} placeholder="1 = very low, 10 = great" min="1" max="10" />
                             </div>
                             <div className="form-group-log">
                                 <label>Anxiety level (1–10)</label>
-                                <input
-                                    type="number"
-                                    name="anxietyScore"
-                                    value={details.anxietyScore}
-                                    onChange={handleDetailChange}
-                                    placeholder="1 = none, 10 = severe"
-                                    min="1"
-                                    max="10"
-                                />
+                                <input type="number" name="anxietyScore" value={details.anxietyScore} onChange={handleDetailChange} placeholder="1 = none, 10 = severe" min="1" max="10" />
                             </div>
                         </div>
                     </div>
@@ -303,28 +261,11 @@ export default function MentalLogPage() {
                         <div className="form-row-log">
                             <div className="form-group-log">
                                 <label>Sleep quality (1–10)</label>
-                                <input
-                                    type="number"
-                                    name="sleepQuality"
-                                    value={details.sleepQuality}
-                                    onChange={handleDetailChange}
-                                    placeholder="1 = terrible, 10 = great"
-                                    min="1"
-                                    max="10"
-                                />
+                                <input type="number" name="sleepQuality" value={details.sleepQuality} onChange={handleDetailChange} placeholder="1 = terrible, 10 = great" min="1" max="10" />
                             </div>
                             <div className="form-group-log">
                                 <label>Hours slept</label>
-                                <input
-                                    type="number"
-                                    name="sleepHours"
-                                    value={details.sleepHours}
-                                    onChange={handleDetailChange}
-                                    placeholder="e.g. 7.5"
-                                    min="0"
-                                    max="24"
-                                    step="0.5"
-                                />
+                                <input type="number" name="sleepHours" value={details.sleepHours} onChange={handleDetailChange} placeholder="e.g. 7.5" min="0" max="24" step="0.5" />
                             </div>
                         </div>
                     </div>
@@ -333,11 +274,7 @@ export default function MentalLogPage() {
                         <h3 className="symptom-section-title">Stress context</h3>
                         <div className="form-group-log">
                             <label>Was there a specific stressor today?</label>
-                            <select
-                                name="stressEventType"
-                                value={details.stressEventType}
-                                onChange={handleDetailChange}
-                            >
+                            <select name="stressEventType" value={details.stressEventType} onChange={handleDetailChange}>
                                 <option value="NONE">No specific stressor</option>
                                 <option value="WORK">Work stress</option>
                                 <option value="RELATIONSHIPS">Relationship stress</option>
@@ -348,12 +285,7 @@ export default function MentalLogPage() {
                             </select>
                         </div>
                         <label className="checkbox-item" style={{ marginTop: 8 }}>
-                            <input
-                                type="checkbox"
-                                name="meditationDone"
-                                checked={details.meditationDone}
-                                onChange={handleDetailChange}
-                            />
+                            <input type="checkbox" name="meditationDone" checked={details.meditationDone} onChange={handleDetailChange} />
                             🧘 I meditated or did mindfulness today
                         </label>
                     </div>
@@ -361,13 +293,7 @@ export default function MentalLogPage() {
                     <div className="symptom-section">
                         <div className="form-group-log">
                             <label>What's on your mind today? (optional)</label>
-                            <textarea
-                                name="notes"
-                                value={details.notes}
-                                onChange={handleDetailChange}
-                                placeholder="Any emotional context you want to remember..."
-                                rows={3}
-                            />
+                            <textarea name="notes" value={details.notes} onChange={handleDetailChange} placeholder="Any emotional context you want to remember..." rows={3} />
                         </div>
                     </div>
 
@@ -377,6 +303,7 @@ export default function MentalLogPage() {
                         {loading ? "Saving..." : "✓ Save mental check-in"}
                     </button>
                 </div>
+                <Toast message="Mental check-in saved! 🧠" visible={showToast} onHide={() => setShowToast(false)} />
             </div>
         );
     }

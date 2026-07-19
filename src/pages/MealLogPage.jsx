@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { saveMealLog } from "../api/api";
+import Toast from "../components/Toast";
 import "./LogPage.css";
 import "./MealLogPage.css";
 
@@ -28,6 +29,7 @@ export default function MealLogPage() {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showToast, setShowToast] = useState(false);
 
     function handleChange(e) {
         const { name, value, type, checked } = e.target;
@@ -48,13 +50,11 @@ export default function MealLogPage() {
             setError("Please describe what you ate.");
             return;
         }
-
         setLoading(true);
         setError("");
-
         try {
             await saveMealLog({
-				logDate: new Date().toLocaleDateString("en-CA"), // formats as YYYY-MM-DD in local time
+                logDate: new Date().toLocaleDateString("en-CA"),
                 description: form.description,
                 safetyRating: form.safetyRating,
                 triggerTags: form.selectedTags.join(","),
@@ -62,7 +62,8 @@ export default function MealLogPage() {
                 notes: form.notes || null,
                 mealTime: new Date().toISOString(),
             });
-            navigate("/log");
+            setShowToast(true);
+            setTimeout(() => navigate("/log"), 2000);
         } catch (err) {
             setError("Could not save your meal. Please try again.");
         } finally {
@@ -76,24 +77,14 @@ export default function MealLogPage() {
                 <button className="back-btn" onClick={() => navigate("/log")}>← Back</button>
                 <h1 className="log-title">🥗 Log a Meal</h1>
             </div>
-
             <div className="log-card">
-
-                {/* DESCRIPTION */}
                 <div className="symptom-section">
                     <div className="form-group-log">
                         <label>What did you eat?</label>
-                        <textarea
-                            name="description"
-                            value={form.description}
-                            onChange={handleChange}
-                            placeholder="e.g. Grilled chicken with rice and steamed broccoli"
-                            rows={3}
-                        />
+                        <textarea name="description" value={form.description} onChange={handleChange} placeholder="e.g. Grilled chicken with rice and steamed broccoli" rows={3} />
                     </div>
                 </div>
 
-                {/* SAFETY RATING */}
                 <div className="symptom-section">
                     <h3 className="symptom-section-title">How did this meal feel?</h3>
                     <div className="safety-rating-group">
@@ -114,7 +105,6 @@ export default function MealLogPage() {
                     </div>
                 </div>
 
-                {/* TRIGGER TAGS */}
                 <div className="symptom-section">
                     <h3 className="symptom-section-title">IBD trigger ingredients (select all that apply)</h3>
                     <div className="tag-grid">
@@ -130,44 +120,27 @@ export default function MealLogPage() {
                     </div>
                 </div>
 
-                {/* PRECEDED FLARE */}
                 <div className="symptom-section">
                     <label className="checkbox-item">
-                        <input
-                            type="checkbox"
-                            name="precededFlare"
-                            checked={form.precededFlare}
-                            onChange={handleChange}
-                        />
+                        <input type="checkbox" name="precededFlare" checked={form.precededFlare} onChange={handleChange} />
                         🔥 This meal was followed by a flare or worsening symptoms
                     </label>
                 </div>
 
-                {/* NOTES */}
                 <div className="symptom-section">
                     <div className="form-group-log">
                         <label>Notes (optional)</label>
-                        <textarea
-                            name="notes"
-                            value={form.notes}
-                            onChange={handleChange}
-                            placeholder="Any other details about this meal..."
-                            rows={2}
-                        />
+                        <textarea name="notes" value={form.notes} onChange={handleChange} placeholder="Any other details about this meal..." rows={2} />
                     </div>
                 </div>
 
                 {error && <p className="log-error">{error}</p>}
 
-                <button
-                    className="submit-btn"
-                    onClick={handleSubmit}
-                    disabled={loading}
-                >
+                <button className="submit-btn" onClick={handleSubmit} disabled={loading}>
                     {loading ? "Saving..." : "✓ Save meal"}
                 </button>
-
             </div>
+            <Toast message="Meal logged! 🥗" visible={showToast} onHide={() => setShowToast(false)} />
         </div>
     );
 }

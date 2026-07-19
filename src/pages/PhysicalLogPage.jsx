@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { savePhysicalLog, getPhysicalLogByDate } from "../api/api";
+import Toast from "../components/Toast";
 import "./LogPage.css";
 
-// ===============================
-// GUIDED PAIN QUESTIONS
-// ===============================
 const PAIN_QUESTIONS = [
     {
         id: "location",
@@ -55,8 +53,7 @@ const PAIN_QUESTIONS = [
 
 function calculatePainScore(answers) {
     const total = Object.values(answers).reduce((sum, v) => sum + v, 0);
-    const max = 16;
-    return Math.round((total / max) * 10);
+    return Math.round((total / 16) * 10);
 }
 
 export default function PhysicalLogPage() {
@@ -88,6 +85,7 @@ export default function PhysicalLogPage() {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showToast, setShowToast] = useState(false);
 
     const isCrohns = user?.condition === "CROHNS";
 
@@ -98,7 +96,7 @@ export default function PhysicalLogPage() {
                 const res = await getPhysicalLogByDate(today);
                 if (res.data) setAlreadyLogged(true);
             } catch (err) {
-                // No log found for today — that's fine
+                // No log found for today
             } finally {
                 setCheckingLog(false);
             }
@@ -119,10 +117,7 @@ export default function PhysicalLogPage() {
 
     function handleSymptomChange(e) {
         const { name, value, type, checked } = e.target;
-        setSymptoms({
-            ...symptoms,
-            [name]: type === "checkbox" ? checked : value,
-        });
+        setSymptoms({ ...symptoms, [name]: type === "checkbox" ? checked : value });
     }
 
     async function handleSubmit() {
@@ -131,7 +126,7 @@ export default function PhysicalLogPage() {
         const painScore = calculatePainScore(painAnswers);
         try {
             await savePhysicalLog({
-				logDate: new Date().toLocaleDateString("en-CA"), // formats as YYYY-MM-DD in local time
+                logDate: new Date().toLocaleDateString("en-CA"),
                 painScore,
                 painAnswers: JSON.stringify(painAnswers),
                 bowelFrequency: symptoms.bowelFrequency ? Number(symptoms.bowelFrequency) : null,
@@ -151,7 +146,8 @@ export default function PhysicalLogPage() {
                 energyLevel: symptoms.energyLevel ? Number(symptoms.energyLevel) : null,
                 notes: symptoms.notes || null,
             });
-            navigate("/log");
+            setShowToast(true);
+            setTimeout(() => navigate("/log"), 2000);
         } catch (err) {
             setError("Could not save your log. Please try again.");
         } finally {
@@ -159,9 +155,6 @@ export default function PhysicalLogPage() {
         }
     }
 
-    // ===============================
-    // CHECKING
-    // ===============================
     if (checkingLog) {
         return (
             <div className="log-page">
@@ -170,54 +163,39 @@ export default function PhysicalLogPage() {
                     <h1 className="log-title">🩺 Physical Check-in</h1>
                 </div>
                 <div className="log-card">
-                    <p style={{ color: "#8892a4", textAlign: "center" }}>Checking today's log...</p>
+                    <p style={{ color: "var(--text-muted)", textAlign: "center" }}>Checking today's log...</p>
                 </div>
             </div>
         );
     }
 
-    // ===============================
-    // ALREADY LOGGED
-    // ===============================
     if (alreadyLogged) {
-    return (
-        <div className="log-page">
-            <div className="log-header">
-                <button className="back-btn" onClick={() => navigate("/log")}>← Back</button>
-                <h1 className="log-title">🩺 Physical Check-in</h1>
+        return (
+            <div className="log-page">
+                <div className="log-header">
+                    <button className="back-btn" onClick={() => navigate("/log")}>← Back</button>
+                    <h1 className="log-title">🩺 Physical Check-in</h1>
+                </div>
+                <div className="log-card">
+                    <div className="already-logged">
+                        <span className="already-logged-icon">✅</span>
+                        <h3>Already logged today</h3>
+                        <p>You've already completed your physical check-in for today.</p>
+                        <button className="submit-btn" onClick={() => setAlreadyLogged(false)} style={{ marginTop: 8 }}>
+                            ✏️ Edit today's log
+                        </button>
+                        <button className="back-step-btn" onClick={() => navigate("/log")} style={{ marginTop: 12 }}>
+                            ← Back to Log
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div className="log-card">
-                <div className="already-logged">
-                    <span className="already-logged-icon">✅</span>
-                    <h3>Already logged today</h3>
-                    <p>You've already completed your physical check-in for today.</p>
-                    <button
-                        className="submit-btn"
-                        onClick={() => setAlreadyLogged(false)}
-                        style={{ marginTop: 8 }}
-                    >
-                        ✏️ Edit today's log
-                    </button>
-                    <button
-                        className="back-step-btn"
-                        onClick={() => navigate("/log")}
-                        style={{ marginTop: 12 }}
-					>
-							← Back to Log
-						</button>
-					</div>
-				</div>
-			</div>
-		);
-	}
+        );
+    }
 
-    // ===============================
-    // PAIN QUESTION PHASE
-    // ===============================
     if (phase === "pain") {
         const question = PAIN_QUESTIONS[painStep];
-        const progress = ((painStep) / PAIN_QUESTIONS.length) * 100;
-
+        const progress = (painStep / PAIN_QUESTIONS.length) * 100;
         return (
             <div className="log-page">
                 <div className="log-header">
@@ -232,11 +210,7 @@ export default function PhysicalLogPage() {
                     <h2 className="guided-question">{question.question}</h2>
                     <div className="options-list">
                         {question.options.map((option) => (
-                            <button
-                                key={option.label}
-                                className="option-btn"
-                                onClick={() => handlePainAnswer(option.value)}
-                            >
+                            <button key={option.label} className="option-btn" onClick={() => handlePainAnswer(option.value)}>
                                 {option.label}
                             </button>
                         ))}
@@ -251,12 +225,8 @@ export default function PhysicalLogPage() {
         );
     }
 
-    // ===============================
-    // SYMPTOMS PHASE
-    // ===============================
     if (phase === "symptoms") {
         const painScore = calculatePainScore(painAnswers);
-
         return (
             <div className="log-page">
                 <div className="log-header">
@@ -264,7 +234,6 @@ export default function PhysicalLogPage() {
                     <h1 className="log-title">🩺 Physical Check-in</h1>
                 </div>
                 <div className="log-card">
-
                     <div className="score-result">
                         <div className="score-circle">
                             <span className="score-num">{painScore}</span>
@@ -275,8 +244,7 @@ export default function PhysicalLogPage() {
                             <p className="score-sublabel">
                                 {painScore <= 2 ? "Low pain — great day 🟢" :
                                  painScore <= 5 ? "Moderate pain 🟡" :
-                                 painScore <= 7 ? "High pain 🟠" :
-                                 "Very high pain 🔴"}
+                                 painScore <= 7 ? "High pain 🟠" : "Very high pain 🔴"}
                             </p>
                         </div>
                     </div>
@@ -286,15 +254,7 @@ export default function PhysicalLogPage() {
                         <div className="form-row-log">
                             <div className="form-group-log">
                                 <label>Bowel movements today</label>
-                                <input
-                                    type="number"
-                                    name="bowelFrequency"
-                                    value={symptoms.bowelFrequency}
-                                    onChange={handleSymptomChange}
-                                    placeholder="e.g. 3"
-                                    min="0"
-                                    max="20"
-                                />
+                                <input type="number" name="bowelFrequency" value={symptoms.bowelFrequency} onChange={handleSymptomChange} placeholder="e.g. 3" min="0" max="20" />
                             </div>
                             <div className="form-group-log">
                                 <label>Bristol Stool Type (1–7)</label>
@@ -332,12 +292,7 @@ export default function PhysicalLogPage() {
                                 { name: "bloating", label: "💨 Bloating" },
                             ].map((s) => (
                                 <label key={s.name} className="checkbox-item">
-                                    <input
-                                        type="checkbox"
-                                        name={s.name}
-                                        checked={symptoms[s.name]}
-                                        onChange={handleSymptomChange}
-                                    />
+                                    <input type="checkbox" name={s.name} checked={symptoms[s.name]} onChange={handleSymptomChange} />
                                     {s.label}
                                 </label>
                             ))}
@@ -354,12 +309,7 @@ export default function PhysicalLogPage() {
                                     { name: "skinIssues", label: "🔴 Skin issues" },
                                 ].map((s) => (
                                     <label key={s.name} className="checkbox-item">
-                                        <input
-                                            type="checkbox"
-                                            name={s.name}
-                                            checked={symptoms[s.name]}
-                                            onChange={handleSymptomChange}
-                                        />
+                                        <input type="checkbox" name={s.name} checked={symptoms[s.name]} onChange={handleSymptomChange} />
                                         {s.label}
                                     </label>
                                 ))}
@@ -377,12 +327,7 @@ export default function PhysicalLogPage() {
                                     { name: "tenesmus", label: "😣 Tenesmus" },
                                 ].map((s) => (
                                     <label key={s.name} className="checkbox-item">
-                                        <input
-                                            type="checkbox"
-                                            name={s.name}
-                                            checked={symptoms[s.name]}
-                                            onChange={handleSymptomChange}
-                                        />
+                                        <input type="checkbox" name={s.name} checked={symptoms[s.name]} onChange={handleSymptomChange} />
                                         {s.label}
                                     </label>
                                 ))}
@@ -393,25 +338,11 @@ export default function PhysicalLogPage() {
                     <div className="symptom-section">
                         <div className="form-group-log">
                             <label>Energy level (1–10)</label>
-                            <input
-                                type="number"
-                                name="energyLevel"
-                                value={symptoms.energyLevel}
-                                onChange={handleSymptomChange}
-                                placeholder="1 = exhausted, 10 = great"
-                                min="1"
-                                max="10"
-                            />
+                            <input type="number" name="energyLevel" value={symptoms.energyLevel} onChange={handleSymptomChange} placeholder="1 = exhausted, 10 = great" min="1" max="10" />
                         </div>
                         <div className="form-group-log">
                             <label>Notes (optional)</label>
-                            <textarea
-                                name="notes"
-                                value={symptoms.notes}
-                                onChange={handleSymptomChange}
-                                placeholder="Anything else you want to remember about today..."
-                                rows={3}
-                            />
+                            <textarea name="notes" value={symptoms.notes} onChange={handleSymptomChange} placeholder="Anything else you want to remember about today..." rows={3} />
                         </div>
                     </div>
 
@@ -421,6 +352,7 @@ export default function PhysicalLogPage() {
                         {loading ? "Saving..." : "✓ Save physical log"}
                     </button>
                 </div>
+                <Toast message="Physical check-in saved! 🩺" visible={showToast} onHide={() => setShowToast(false)} />
             </div>
         );
     }
