@@ -420,20 +420,20 @@ export default function HomePage() {
             <section className="today-status">
                 <h3 className="section-title">Today's check-ins</h3>
                 <div className="today-cards">
-                    <Link to="/log" className={`today-card ${todayPhysical ? "done" : "pending"}`}>
-                        <span className="today-icon">🩺</span>
-                        <span className="today-label">Physical</span>
-                        <span className="today-status-badge">
-                            {todayPhysical ? "✓ Logged" : "Not yet"}
-                        </span>
-                    </Link>
-                    <Link to="/log" className={`today-card ${todayMental ? "done" : "pending"}`}>
-                        <span className="today-icon">🧠</span>
-                        <span className="today-label">Mental</span>
-                        <span className="today-status-badge">
-                            {todayMental ? "✓ Logged" : "Not yet"}
-                        </span>
-                    </Link>
+                    <Link to="/log/physical" className={`today-card ${todayPhysical ? "done" : "pending"}`}>
+						<span className="today-icon">🩺</span>
+						<span className="today-label">Physical</span>
+						<span className="today-status-badge">
+							{todayPhysical ? "✓ Logged" : "Not yet"}
+						</span>
+					</Link>
+					<Link to="/log/mental" className={`today-card ${todayMental ? "done" : "pending"}`}>
+						<span className="today-icon">🧠</span>
+						<span className="today-label">Mental</span>
+						<span className="today-status-badge">
+							{todayMental ? "✓ Logged" : "Not yet"}
+						</span>
+					</Link>
                 </div>
             </section>
 
