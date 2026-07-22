@@ -45,11 +45,11 @@ export default function FlareHistory() {
     }
 
     function formatDateTime(dateStr) {
-        if (!dateStr) return "--";
-        const date = new Date(dateStr);
-        return date.toLocaleDateString("en-CA") + " " +
-            date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    }
+		if (!dateStr) return "--";
+		const date = new Date(dateStr);
+		return date.toLocaleDateString("en-CA") + " " +
+			date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+	}
 
     function getFlareDuration(startStr, endStr) {
         if (!startStr || !endStr) return null;

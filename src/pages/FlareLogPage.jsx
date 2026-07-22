@@ -10,7 +10,7 @@ export default function FlareLogPage() {
     const [checkingFlares, setCheckingFlares] = useState(true);
     const [mode, setMode] = useState(null);
     const [form, setForm] = useState({
-        startDate: new Date().toLocaleDateString("en-CA"),
+        startDate: new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
         endDate: "",
         severity: "",
         physicalContext: "",
@@ -47,13 +47,20 @@ export default function FlareLogPage() {
         setForm({ ...form, [name]: type === "checkbox" ? checked : value });
     }
 
+    function formatStartDate(dateStr) {
+		if (!dateStr) return "--";
+		const date = new Date(dateStr);
+		return date.toLocaleDateString("en-CA") + " " +
+			date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+	}
+
     async function handleSubmitNew() {
         setLoading(true);
         setError("");
         try {
             await saveFlare({
-                startDate: form.startDate,
-                endDate: form.endDate || null,
+                startDate: form.startDate ? form.startDate.replace("Z", "") : null,
+                endDate: form.endDate ? form.endDate.replace("Z", "") : null,
                 severity: form.severity ? Number(form.severity) : null,
                 physicalContext: form.physicalContext || null,
                 mentalContext: form.mentalContext || null,
@@ -74,7 +81,7 @@ export default function FlareLogPage() {
 
     async function handleResolve() {
         if (!form.endDate) {
-            setError("Please enter an end date to resolve the flare.");
+            setError("Please enter an end date and time to resolve the flare.");
             return;
         }
         setLoading(true);
@@ -82,7 +89,7 @@ export default function FlareLogPage() {
         try {
             await updateFlare(ongoingFlare.id, {
                 ...ongoingFlare,
-                endDate: form.endDate,
+                endDate: form.endDate.replace("Z", ""),
                 resolvedNaturally: form.resolvedNaturally,
                 requiredMedicalAttention: form.requiredMedicalAttention,
                 notes: form.notes || ongoingFlare.notes,
@@ -146,7 +153,9 @@ export default function FlareLogPage() {
                         <span className="ongoing-icon">🔥</span>
                         <div>
                             <p className="ongoing-title">You have an ongoing flare</p>
-                            <p className="ongoing-subtitle">Started {ongoingFlare.startDate} — not yet resolved</p>
+                            <p className="ongoing-subtitle">
+                                Started {formatStartDate(ongoingFlare.startDate)}
+                            </p>
                         </div>
                     </div>
                     <p style={{ fontSize: "0.88rem", color: "var(--text-muted)", textAlign: "center" }}>
@@ -187,17 +196,28 @@ export default function FlareLogPage() {
                         <span className="ongoing-icon">🔥</span>
                         <div>
                             <p className="ongoing-title">Adding to ongoing flare</p>
-                            <p className="ongoing-subtitle">Started {ongoingFlare.startDate}</p>
+                            <p className="ongoing-subtitle">
+                                Started {formatStartDate(ongoingFlare.startDate)}
+                            </p>
                         </div>
                     </div>
                     <div className="symptom-section">
                         <div className="form-group-log">
                             <label>Date of symptoms</label>
-                            <input type="date" value={symptomDate} onChange={(e) => setSymptomDate(e.target.value)} />
+                            <input
+                                type="date"
+                                value={symptomDate}
+                                onChange={(e) => setSymptomDate(e.target.value)}
+                            />
                         </div>
                         <div className="form-group-log">
                             <label>Symptoms on this date</label>
-                            <textarea value={symptomNotes} onChange={(e) => setSymptomNotes(e.target.value)} placeholder="Describe your symptoms for this specific day..." rows={4} />
+                            <textarea
+                                value={symptomNotes}
+                                onChange={(e) => setSymptomNotes(e.target.value)}
+                                placeholder="Describe your symptoms for this specific day..."
+                                rows={4}
+                            />
                         </div>
                     </div>
                     {error && <p className="log-error">{error}</p>}
@@ -222,14 +242,21 @@ export default function FlareLogPage() {
                         <span className="ongoing-icon">🔥</span>
                         <div>
                             <p className="ongoing-title">Resolving flare</p>
-                            <p className="ongoing-subtitle">Started {ongoingFlare.startDate}</p>
+                            <p className="ongoing-subtitle">
+                                Started {formatStartDate(ongoingFlare.startDate)}
+                            </p>
                         </div>
                     </div>
                     <div className="symptom-section">
-                        <h3 className="symptom-section-title">End date</h3>
+                        <h3 className="symptom-section-title">End date & time</h3>
                         <div className="form-group-log">
                             <label>When did the flare end?</label>
-                            <input type="date" name="endDate" value={form.endDate} onChange={handleChange} />
+                            <input
+                                type="datetime-local"
+                                name="endDate"
+                                value={form.endDate}
+                                onChange={handleChange}
+                            />
                         </div>
                     </div>
                     {form.endDate && (
@@ -256,7 +283,12 @@ export default function FlareLogPage() {
                         </>
                     )}
                     {error && <p className="log-error">{error}</p>}
-                    <button className="submit-btn" onClick={handleResolve} disabled={loading || !form.endDate} style={{ opacity: !form.endDate ? 0.5 : 1 }}>
+                    <button
+                        className="submit-btn"
+                        onClick={handleResolve}
+                        disabled={loading || !form.endDate}
+                        style={{ opacity: !form.endDate ? 0.5 : 1 }}
+                    >
                         {loading ? "Saving..." : "✓ Resolve flare"}
                     </button>
                 </div>
@@ -273,15 +305,25 @@ export default function FlareLogPage() {
             </div>
             <div className="log-card">
                 <div className="symptom-section">
-                    <h3 className="symptom-section-title">Flare dates</h3>
+                    <h3 className="symptom-section-title">Flare dates & times</h3>
                     <div className="form-row-log">
                         <div className="form-group-log">
-                            <label>Start date</label>
-                            <input type="date" name="startDate" value={form.startDate} onChange={handleChange} />
+                            <label>Start date & time</label>
+                            <input
+                                type="datetime-local"
+                                name="startDate"
+                                value={form.startDate}
+                                onChange={handleChange}
+                            />
                         </div>
                         <div className="form-group-log">
-                            <label>End date (leave blank if ongoing)</label>
-                            <input type="date" name="endDate" value={form.endDate} onChange={handleChange} />
+                            <label>End date & time (leave blank if ongoing)</label>
+                            <input
+                                type="datetime-local"
+                                name="endDate"
+                                value={form.endDate}
+                                onChange={handleChange}
+                            />
                         </div>
                     </div>
                 </div>
