@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { savePhysicalLog, getPhysicalLogByDate } from "../api/api";
 import Toast from "../components/Toast";
+import BowelMovementLogger from "../components/BowelMovementLogger";
 import "./LogPage.css";
 
 const PAIN_QUESTIONS = [
@@ -65,10 +66,8 @@ export default function PhysicalLogPage() {
     const [phase, setPhase] = useState("pain");
     const [painStep, setPainStep] = useState(0);
     const [painAnswers, setPainAnswers] = useState({});
+    const [bowelMovements, setBowelMovements] = useState([]);
     const [symptoms, setSymptoms] = useState({
-        bowelFrequency: "",
-        bristolType: "",
-        bloodPresence: "NONE",
         fatigue: false,
         jointPain: false,
         nausea: false,
@@ -129,9 +128,14 @@ export default function PhysicalLogPage() {
                 logDate: new Date().toLocaleDateString("en-CA"),
                 painScore,
                 painAnswers: JSON.stringify(painAnswers),
-                bowelFrequency: symptoms.bowelFrequency ? Number(symptoms.bowelFrequency) : null,
-                bristolType: symptoms.bristolType ? Number(symptoms.bristolType) : null,
-                bloodPresence: symptoms.bloodPresence,
+                bowelFrequency: bowelMovements.length > 0 ? bowelMovements.length : null,
+                bristolType: bowelMovements.length > 0
+                    ? Math.round(bowelMovements.reduce((s, m) => s + (m.type || 0), 0) / bowelMovements.length)
+                    : null,
+                bloodPresence: bowelMovements.some(m => m.blood === "SIGNIFICANT") ? "SIGNIFICANT" :
+                               bowelMovements.some(m => m.blood === "MODERATE") ? "MODERATE" :
+                               bowelMovements.some(m => m.blood === "TRACE") ? "TRACE" : "NONE",
+                bowelMovementLogs: bowelMovements.length > 0 ? JSON.stringify(bowelMovements) : null,
                 fatigue: symptoms.fatigue,
                 jointPain: symptoms.jointPain,
                 nausea: symptoms.nausea,
@@ -249,38 +253,16 @@ export default function PhysicalLogPage() {
                         </div>
                     </div>
 
+                    {/* BOWEL TRACKING */}
                     <div className="symptom-section">
                         <h3 className="symptom-section-title">Bowel tracking</h3>
-                        <div className="form-row-log">
-                            <div className="form-group-log">
-                                <label>Bowel movements today</label>
-                                <input type="number" name="bowelFrequency" value={symptoms.bowelFrequency} onChange={handleSymptomChange} placeholder="e.g. 3" min="0" max="20" />
-                            </div>
-                            <div className="form-group-log">
-                                <label>Bristol Stool Type (1–7)</label>
-                                <select name="bristolType" value={symptoms.bristolType} onChange={handleSymptomChange}>
-                                    <option value="">Select type</option>
-                                    <option value="1">Type 1 — Separate hard lumps</option>
-                                    <option value="2">Type 2 — Lumpy sausage</option>
-                                    <option value="3">Type 3 — Cracked sausage</option>
-                                    <option value="4">Type 4 — Smooth sausage</option>
-                                    <option value="5">Type 5 — Soft blobs</option>
-                                    <option value="6">Type 6 — Fluffy pieces</option>
-                                    <option value="7">Type 7 — Watery</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="form-group-log">
-                            <label>Blood presence</label>
-                            <select name="bloodPresence" value={symptoms.bloodPresence} onChange={handleSymptomChange}>
-                                <option value="NONE">None</option>
-                                <option value="TRACE">Trace</option>
-                                <option value="MODERATE">Moderate</option>
-                                <option value="SIGNIFICANT">Significant</option>
-                            </select>
-                        </div>
+                        <BowelMovementLogger
+                            movements={bowelMovements}
+                            onChange={setBowelMovements}
+                        />
                     </div>
 
+                    {/* GENERAL SYMPTOMS */}
                     <div className="symptom-section">
                         <h3 className="symptom-section-title">Symptoms today</h3>
                         <div className="checkbox-grid">
@@ -299,6 +281,7 @@ export default function PhysicalLogPage() {
                         </div>
                     </div>
 
+                    {/* CONDITION SPECIFIC */}
                     {isCrohns && (
                         <div className="symptom-section">
                             <h3 className="symptom-section-title">Crohn's specific</h3>
@@ -335,14 +318,29 @@ export default function PhysicalLogPage() {
                         </div>
                     )}
 
+                    {/* ENERGY & NOTES */}
                     <div className="symptom-section">
                         <div className="form-group-log">
                             <label>Energy level (1–10)</label>
-                            <input type="number" name="energyLevel" value={symptoms.energyLevel} onChange={handleSymptomChange} placeholder="1 = exhausted, 10 = great" min="1" max="10" />
+                            <input
+                                type="number"
+                                name="energyLevel"
+                                value={symptoms.energyLevel}
+                                onChange={handleSymptomChange}
+                                placeholder="1 = exhausted, 10 = great"
+                                min="1"
+                                max="10"
+                            />
                         </div>
                         <div className="form-group-log">
                             <label>Notes (optional)</label>
-                            <textarea name="notes" value={symptoms.notes} onChange={handleSymptomChange} placeholder="Anything else you want to remember about today..." rows={3} />
+                            <textarea
+                                name="notes"
+                                value={symptoms.notes}
+                                onChange={handleSymptomChange}
+                                placeholder="Anything else you want to remember about today..."
+                                rows={3}
+                            />
                         </div>
                     </div>
 

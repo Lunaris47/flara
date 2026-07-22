@@ -1,0 +1,185 @@
+.bm-logger {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bm-empty {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: 8px 0;
+}
+
+.bm-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bm-entry {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.bm-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.bm-entry-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.bm-remove-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: color 0.2s;
+}
+
+.bm-remove-btn:hover {
+    color: #fc8181;
+}
+
+.bm-field-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+/* BRISTOL GRID */
+.bristol-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.bristol-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.bristol-btn:hover {
+    border-color: var(--accent);
+    background: var(--bg-primary);
+}
+
+.bristol-btn.selected {
+    border-color: var(--accent);
+    background: var(--bg-primary);
+}
+
+.bristol-btn-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.bristol-btn-desc {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* TOOLTIP */
+.bristol-tooltip {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-top: 8px;
+}
+
+.bristol-tooltip-label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.bristol-tooltip-clinical {
+    font-size: 0.78rem;
+    color: var(--accent);
+}
+
+/* BLOOD SELECTOR */
+.blood-selector {
+    display: flex;
+    gap: 8px;
+}
+
+.blood-btn {
+    flex: 1;
+    padding: 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.blood-btn:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
+.blood-btn.selected {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--bg-primary);
+}
+
+/* ADD BUTTON */
+.bm-add-btn {
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.bm-add-btn:hover {
+    border-color: var(--accent);
+    background: var(--bg-tertiary);
+}
+
+@media (max-width: 500px) {
+    .bristol-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
