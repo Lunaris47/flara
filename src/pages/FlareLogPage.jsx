@@ -4,6 +4,21 @@ import { saveFlare, updateFlare, getFlares } from "../api/api";
 import Toast from "../components/Toast";
 import "./LogPage.css";
 
+const FLARE_SYMPTOMS = [
+    { key: "severeAbdominalPain", label: "🔥 Severe abdominal pain" },
+    { key: "crampingBloating", label: "💨 Cramping & bloating" },
+    { key: "bloodInStool", label: "🩸 Blood in stool" },
+    { key: "frequentBowelMovements", label: "🚽 Frequent bowel movements" },
+    { key: "urgency", label: "⚡ Urgency" },
+    { key: "nausea", label: "🤢 Nausea or vomiting" },
+    { key: "fever", label: "🌡️ Fever or chills" },
+    { key: "fatigue", label: "😴 Extreme fatigue" },
+    { key: "jointPain", label: "🦴 Joint pain" },
+    { key: "lossOfAppetite", label: "🍽️ Loss of appetite" },
+    { key: "dehydration", label: "💧 Dehydration" },
+    { key: "insomniaFromPain", label: "😣 Couldn't sleep from pain" },
+];
+
 export default function FlareLogPage() {
     const navigate = useNavigate();
     const [ongoingFlare, setOngoingFlare] = useState(null);
@@ -21,7 +36,9 @@ export default function FlareLogPage() {
         notes: "",
     });
     const [symptomDate, setSymptomDate] = useState(new Date().toLocaleDateString("en-CA"));
-    const [symptomNotes, setSymptomNotes] = useState("");
+    const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+    const [symptomSeverity, setSymptomSeverity] = useState("");
+    const [symptomExtraNotes, setSymptomExtraNotes] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [showToast, setShowToast] = useState(false);
@@ -48,11 +65,11 @@ export default function FlareLogPage() {
     }
 
     function formatStartDate(dateStr) {
-		if (!dateStr) return "--";
-		const date = new Date(dateStr);
-		return date.toLocaleDateString("en-CA") + " " +
-			date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
-	}
+        if (!dateStr) return "--";
+        const date = new Date(dateStr);
+        return date.toLocaleDateString("en-CA") + " " +
+            date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+    }
 
     async function handleSubmitNew() {
         setLoading(true);
@@ -105,17 +122,22 @@ export default function FlareLogPage() {
     }
 
     async function handleAddSymptoms() {
-        if (!symptomNotes.trim()) {
-            setError("Please describe your symptoms for this date.");
+        if (selectedSymptoms.length === 0) {
+            setError("Please select at least one symptom.");
             return;
         }
         setLoading(true);
         setError("");
         try {
             const existingNotes = ongoingFlare.notes || "";
-            const updatedNotes = existingNotes
-                ? `${existingNotes}\n\n[${symptomDate}] ${symptomNotes}`
-                : `[${symptomDate}] ${symptomNotes}`;
+            const symptomList = selectedSymptoms
+                .map(k => FLARE_SYMPTOMS.find(s => s.key === k)?.label)
+                .filter(Boolean)
+                .join(", ");
+            const severityText = symptomSeverity ? ` | Severity: ${symptomSeverity}/10` : "";
+            const extraText = symptomExtraNotes ? ` | Notes: ${symptomExtraNotes}` : "";
+            const entry = `[${symptomDate}] ${symptomList}${severityText}${extraText}`;
+            const updatedNotes = existingNotes ? `${existingNotes}\n\n${entry}` : entry;
             await updateFlare(ongoingFlare.id, { ...ongoingFlare, notes: updatedNotes });
             setToastMessage("Symptoms added! 📝");
             setShowToast(true);
@@ -201,6 +223,7 @@ export default function FlareLogPage() {
                             </p>
                         </div>
                     </div>
+
                     <div className="symptom-section">
                         <div className="form-group-log">
                             <label>Date of symptoms</label>
@@ -210,17 +233,55 @@ export default function FlareLogPage() {
                                 onChange={(e) => setSymptomDate(e.target.value)}
                             />
                         </div>
+                    </div>
+
+                    <div className="symptom-section">
+                        <h3 className="symptom-section-title">Symptoms on this date</h3>
+                        <div className="checkbox-grid">
+                            {FLARE_SYMPTOMS.map((s) => (
+                                <label key={s.key} className="checkbox-item">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedSymptoms.includes(s.key)}
+                                        onChange={() => {
+                                            setSelectedSymptoms(prev =>
+                                                prev.includes(s.key)
+                                                    ? prev.filter(k => k !== s.key)
+                                                    : [...prev, s.key]
+                                            );
+                                        }}
+                                    />
+                                    {s.label}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="symptom-section">
                         <div className="form-group-log">
-                            <label>Symptoms on this date</label>
+                            <label>Severity today (1–10)</label>
+                            <input
+                                type="number"
+                                value={symptomSeverity}
+                                onChange={(e) => setSymptomSeverity(e.target.value)}
+                                placeholder="1 = mild, 10 = severe"
+                                min="1"
+                                max="10"
+                            />
+                        </div>
+                        <div className="form-group-log">
+                            <label>Additional notes (optional)</label>
                             <textarea
-                                value={symptomNotes}
-                                onChange={(e) => setSymptomNotes(e.target.value)}
-                                placeholder="Describe your symptoms for this specific day..."
-                                rows={4}
+                                value={symptomExtraNotes}
+                                onChange={(e) => setSymptomExtraNotes(e.target.value)}
+                                placeholder="Anything else to note about today..."
+                                rows={2}
                             />
                         </div>
                     </div>
+
                     {error && <p className="log-error">{error}</p>}
+
                     <button className="submit-btn" onClick={handleAddSymptoms} disabled={loading}>
                         {loading ? "Saving..." : "✓ Add symptoms"}
                     </button>

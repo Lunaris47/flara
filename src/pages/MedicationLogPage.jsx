@@ -24,6 +24,29 @@ const MEDICATION_TYPES = [
     { value: "OTHER", label: "📦 Other" },
 ];
 
+const MEDICATION_TYPE_MAP = {
+    "Humira (adalimumab)": "BIOLOGIC",
+    "Remicade (infliximab)": "BIOLOGIC",
+    "Stelara (ustekinumab)": "BIOLOGIC",
+    "Skyrizi (risankizumab)": "BIOLOGIC",
+    "Entyvio (vedolizumab)": "BIOLOGIC",
+    "Rinvoq (upadacitinib)": "IMMUNOSUPPRESSANT",
+    "Azathioprine": "IMMUNOSUPPRESSANT",
+    "6-Mercaptopurine": "IMMUNOSUPPRESSANT",
+    "Methotrexate": "IMMUNOSUPPRESSANT",
+    "Prednisone": "STEROID",
+    "Budesonide": "STEROID",
+    "Mesalamine": "AMINOSALICYLATE",
+    "Sulfasalazine": "AMINOSALICYLATE",
+    "Ciprofloxacin": "ANTIBIOTIC",
+    "Metronidazole": "ANTIBIOTIC",
+    "Iron supplement": "SUPPLEMENT",
+    "Vitamin D": "SUPPLEMENT",
+    "Vitamin B12": "SUPPLEMENT",
+    "Folic acid": "SUPPLEMENT",
+    "Other": "OTHER",
+};
+
 export default function MedicationLogPage() {
     const navigate = useNavigate();
     const [form, setForm] = useState({
@@ -42,7 +65,15 @@ export default function MedicationLogPage() {
 
     function handleChange(e) {
         const { name, value, type, checked } = e.target;
-        setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+        if (name === "medicationName" && MEDICATION_TYPE_MAP[value]) {
+            setForm({
+                ...form,
+                medicationName: value,
+                medicationType: MEDICATION_TYPE_MAP[value],
+            });
+        } else {
+            setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+        }
     }
 
     async function handleSubmit() {
