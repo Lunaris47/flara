@@ -238,6 +238,7 @@ export default function PhysicalLogPage() {
                     <h1 className="log-title">🩺 Physical Check-in</h1>
                 </div>
                 <div className="log-card">
+
                     <div className="score-result">
                         <div className="score-circle">
                             <span className="score-num">{painScore}</span>
@@ -267,51 +268,79 @@ export default function PhysicalLogPage() {
                         <h3 className="symptom-section-title">Symptoms today</h3>
                         <div className="checkbox-grid">
                             {[
-                                { name: "fatigue", label: "😴 Fatigue" },
-                                { name: "jointPain", label: "🦴 Joint pain" },
-                                { name: "nausea", label: "🤢 Nausea" },
-                                { name: "fever", label: "🌡️ Fever" },
-                                { name: "bloating", label: "💨 Bloating" },
+                                { name: "fatigue", label: "😴 Fatigue", info: "Persistent tiredness that doesn't improve with rest. Very common in IBD due to inflammation, anemia, and disrupted sleep." },
+                                { name: "jointPain", label: "🦴 Joint pain", info: "Pain or swelling in joints, especially knees, ankles, and wrists. An extraintestinal manifestation of IBD affecting up to 30% of patients." },
+                                { name: "nausea", label: "🤢 Nausea", info: "Feeling of sickness or urge to vomit. Can be caused by inflammation, medications, or intestinal obstruction." },
+                                { name: "fever", label: "🌡️ Fever", info: "Body temperature above 38°C (100.4°F). During a flare, fever can indicate active inflammation or infection." },
+                                { name: "bloating", label: "💨 Bloating", info: "Feeling of fullness or swelling in the abdomen. Common in IBD due to altered gut motility and gas production." },
                             ].map((s) => (
                                 <label key={s.name} className="checkbox-item">
                                     <input type="checkbox" name={s.name} checked={symptoms[s.name]} onChange={handleSymptomChange} />
-                                    {s.label}
+                                    <div className="symptom-info-wrapper">
+                                        <span>{s.label}</span>
+                                        <span className="info-icon">
+                                            i
+                                            <span className="info-tooltip">
+                                                <span className="info-tooltip-title">{s.label.replace(/^[^\w]*/u, "")}</span>
+                                                {s.info}
+                                            </span>
+                                        </span>
+                                    </div>
                                 </label>
                             ))}
                         </div>
                     </div>
 
-                    {/* CONDITION SPECIFIC */}
+                    {/* CROHN'S SPECIFIC */}
                     {isCrohns && (
                         <div className="symptom-section">
                             <h3 className="symptom-section-title">Crohn's specific</h3>
                             <div className="checkbox-grid">
                                 {[
-                                    { name: "perianalDiscomfort", label: "⚠️ Perianal discomfort" },
-                                    { name: "mouthSores", label: "💊 Mouth sores" },
-                                    { name: "skinIssues", label: "🔴 Skin issues" },
+                                    { name: "perianalDiscomfort", label: "⚠️ Perianal discomfort", info: "Pain, swelling, or irritation around the anus. In Crohn's, this can include fissures (small tears), fistulas (abnormal tunnels), or abscesses. It's one of the most distinctive features of Crohn's disease." },
+                                    { name: "mouthSores", label: "💊 Mouth sores", info: "Ulcers or sores inside the mouth (aphthous ulcers). An extraintestinal manifestation that often flares alongside gut symptoms. They're painful but not dangerous." },
+                                    { name: "skinIssues", label: "🔴 Skin issues", info: "IBD-related skin conditions including erythema nodosum (tender red bumps, usually on shins) and pyoderma gangrenosum (painful ulcers). These reflect systemic inflammation." },
                                 ].map((s) => (
                                     <label key={s.name} className="checkbox-item">
                                         <input type="checkbox" name={s.name} checked={symptoms[s.name]} onChange={handleSymptomChange} />
-                                        {s.label}
+                                        <div className="symptom-info-wrapper">
+                                            <span>{s.label}</span>
+                                            <span className="info-icon">
+                                                i
+                                                <span className="info-tooltip">
+                                                    <span className="info-tooltip-title">{s.label.replace(/^[^\w]*/u, "")}</span>
+                                                    {s.info}
+                                                </span>
+                                            </span>
+                                        </div>
                                     </label>
                                 ))}
                             </div>
                         </div>
                     )}
 
+                    {/* UC SPECIFIC */}
                     {!isCrohns && (
                         <div className="symptom-section">
                             <h3 className="symptom-section-title">UC specific</h3>
                             <div className="checkbox-grid">
                                 {[
-                                    { name: "rectalBleeding", label: "🩸 Rectal bleeding" },
-                                    { name: "urgency", label: "⚡ Urgency" },
-                                    { name: "tenesmus", label: "😣 Tenesmus" },
+                                    { name: "rectalBleeding", label: "🩸 Rectal bleeding", info: "Blood in stool or on toilet paper. In UC, this occurs because inflammation causes the colon lining to bleed. The amount can range from streaks to significant bleeding and is an important indicator of disease activity." },
+                                    { name: "urgency", label: "⚡ Urgency", info: "Sudden, intense need to have a bowel movement that's difficult to defer. Caused by rectal inflammation reducing the rectum's capacity to hold stool. One of the most disruptive UC symptoms." },
+                                    { name: "tenesmus", label: "😣 Tenesmus", info: "A feeling of incomplete bowel emptying or the constant urge to pass stool even when the bowel is empty. Caused by rectal inflammation. Can be very uncomfortable and is a hallmark symptom of active UC." },
                                 ].map((s) => (
                                     <label key={s.name} className="checkbox-item">
                                         <input type="checkbox" name={s.name} checked={symptoms[s.name]} onChange={handleSymptomChange} />
-                                        {s.label}
+                                        <div className="symptom-info-wrapper">
+                                            <span>{s.label}</span>
+                                            <span className="info-icon">
+                                                i
+                                                <span className="info-tooltip">
+                                                    <span className="info-tooltip-title">{s.label.replace(/^[^\w]*/u, "")}</span>
+                                                    {s.info}
+                                                </span>
+                                            </span>
+                                        </div>
                                     </label>
                                 ))}
                             </div>
